@@ -1,0 +1,172 @@
+@media (min-width: 992px) and (max-width: 1024px) {
+	 
+.navbar-right {
+	float:none !important;
+}
+
+}
+
+@media (min-width: 992px) {
+	 
+ #main-menu.collapse {
+	display: block !important;
+}
+
+}
+
+
+@media (max-width: 992px) {
+
+#main-menu {
+	background:#212121;
+}
+	 
+ .navbar-right {
+	float:none !important;
+	margin-right:0px !important;
+}
+
+ .clear-toggle {
+	display:block;
+}
+
+ .navbar-toggle {
+	display: block !important;
+}
+
+ #main-menu ul li {
+	display: block;
+	text-align: left;
+}
+
+#main-menu ul li a {
+    line-height: 23px;
+    display: inherit;
+    border-bottom: 1px solid #2C2C2C;
+    padding: 10px 20px;
+    background: transparent;
+    font-weight: 400;
+}
+
+#main-menu ul li a:hover, #main-menu ul li.active a {
+	background:#2C2C2C !important;
+	color:#FFF;
+}
+
+#main-menu ul li.active > a {
+    box-shadow: none !important;
+}
+
+.cta-main .cta-btn-main {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.about-intro {
+    padding-left: 0;
+}
+
+.tabs-main {
+    padding-right: 0;
+}
+.accordion-main {
+    padding-left: 0;
+}
+
+
+}
+
+
+@media (max-width: 769px) {
+
+.social-icons {
+    text-align: center;
+}
+.copyright {
+    margin-top: 15px;
+    text-align: center;
+}
+.cta-main{
+	text-align:center;
+}
+
+.cta-main .cta-btn-main{
+	text-align:center;
+	margin-top:15px;
+}
+
+.blog-item .blog-media {
+    width: 100%;
+}
+.blog-item .blog-info {
+    padding: 22px 0px 0px;
+}
+
+}
+
+
+@media (max-width: 600px) {
+	
+.btn {
+    padding: 7px 23px;
+    font-size: 14px;
+    font-weight: 400;
+}
+.testimonial-content {
+    margin-left: 0;
+}
+.testimonial-item .testimonial-photo {
+    position: relative;
+    margin-bottom: 30px;
+}	
+.banner-caption-main h2 {
+    font-size: 26px;
+    line-height: 21px;
+    margin: 47px 0px 23px;
+}
+
+.banner{
+	padding:0px;
+}	
+.banner-caption-main h3 {
+	font-size:16px;
+	line-height: 31px;
+}
+
+.cta-inner h2 {
+    font-size: 27px;
+    line-height: 40px;
+}
+
+.cta-inner p {
+    font-size: 14px;
+}
+
+}
+
+
+@media (max-width: 480px) {
+
+.banner-caption-main h2 {
+    font-size: 29px;
+    line-height: 40px;
+}
+	 
+.banner-caption-main p {
+    font-size: 17px;
+    line-height: 26px;
+}
+
+.banner-caption-main h2 {
+    font-size: 23px;
+    line-height: 30px;
+    margin-top: 30px;
+}
+.banner-caption-main .btn {
+    margin: 0 5px 10px;
+}
+li.comment ol.comment-sub {
+    margin-left: 0;
+}
+	 
+}
