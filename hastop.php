@@ -86,10 +86,10 @@ while ($row = $tampil_kriteria->fetch_array()){
 $kriteria     =array_unique($kriterias);
 $jml_kriteria =count($kriteria);
 
-$tampil_last_update_alternatif = $koneksi->query("SELECT UPDATE_TIME FROM information_schema.tables WHERE TABLE_SCHEMA = 'bg_topsis' AND TABLE_NAME = 'tab_alternatif'");
+$tampil_last_update_alternatif = $koneksi->query("SELECT update_time FROM information_schema.tables WHERE TABLE_SCHEMA = 'bg_topsis' AND TABLE_NAME = 'tab_alternatif'");
 
-while ($row = $tampil_last_update_alternatif->fetch_array()){
-    $last_update = $row->UPDATE_TIME;
+while ($row = $tampil_last_update_alternatif->fetch_object()){
+    $last_update = $row->update_time;
 }
 ?>
 
