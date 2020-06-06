@@ -597,6 +597,7 @@ $jml_kriteria =count($kriteria);
                   ?>
                 </tbody>
               </table>
+              <p id="date"></p>
             </div>
           </div>
         </div>
@@ -615,6 +616,12 @@ $jml_kriteria =count($kriteria);
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css" />
 <script>
     $(document).ready(function() {
+      n =  new Date();
+y = n.getFullYear();
+m = n.getMonth() + 1;
+d = n.getDate();
+document.getElementById("date").innerHTML = "Data diolah pada tanggal: " +m + "/" + d + "/" + y;
+
     $('#tabel-data').dataTable( {
         lengthMenu: [[5, 10, 25, -1], [5, 10, 25, "All"]],
         drawCallback: function () {
