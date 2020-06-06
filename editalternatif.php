@@ -10,7 +10,6 @@ while ($row = $alternatif->fetch_row())
   {
     $nama  = $row[1];
     $genre_alternatif = $row[2];
-    $subtitle = $row[3];
     $tahun_rilis = $row[4];
   }
 
@@ -82,7 +81,7 @@ while ($row = $genre->fetch_array()){
                       <input class="form-control" type="hidden" name="id" value="<?php echo $_GET['id_alternatif']; ?>" >
                     </div>
                     <div class="form-group">
-                      <label for="Nama Drama">Nama BoardGame</label>
+                      <label for="Nama Board Game">Nama BoardGame</label>
                       <input class="form-control" type="text" name="nama" value="<?php echo isset($nama) ? $nama : ''; ?>" >
                     </div>
                     <div class="form-group">
@@ -98,16 +97,8 @@ while ($row = $genre->fetch_array()){
                         ?>
                       </select>
                     </div>
-                    <div class="form-group">
-                      <label for="Genre">Subtitle</label>
-                      <select name="subtitle" class="form-control" id="subtitle">
-                        <option value="all">Semua</option>
-                        <option value="0" <?php echo isset($subtitle) && $subtitle == 0 ? 'selected' : '' ?>>Tidak Ada</option>
-                        <option value="1" <?php echo isset($subtitle) && $subtitle == 1 ? 'selected' : '' ?>>Ada</option>
-                      </select>
-                    </div>
                         <div class="form-group">
-                            <?php $tahun_awal = 2009;
+                            <?php $tahun_awal = 2000;
                               $tahun_terbaru = date('Y');
                              ?>
                              <label for="tahun_rilis">Tahun Rilis</label>
