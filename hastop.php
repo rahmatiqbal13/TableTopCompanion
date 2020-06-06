@@ -16,7 +16,7 @@ FROM
     ".$sql_tabel." c USING(id_kriteria)
   JOIN
     tab_genre d USING(id_genre) ";
-
+    
 
     $is_where = false;
     $sql_where = '';
@@ -77,7 +77,7 @@ while ($row = $genre->fetch_array()){
     $genre_array[] = $row;
 }
 
-$tampil_kriteria = $koneksi->query("SELECT * FROM tab_kriteria");
+$tampil_kriteria = $koneksi->query("SELECT * FROM ".$sql_tabel);
 
 while ($row = $tampil_kriteria->fetch_array()){
     $kriteria_array[] = $row;
