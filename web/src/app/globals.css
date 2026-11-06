@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #f4efe4;
+  --card: #fffcf5;
+  --sunken: #ebe4d5;
+  --ink: #1f1b16;
+  --muted: #6c6357;
+  --line: #ddd4c2;
+  --felt: #1d5a44;
+  --felt-soft: #d6e7dd;
+  --on-felt: #fbf8f1;
+  --meeple: #b9471a;
+  --meeple-soft: #f6dfd2;
+  --gold: #a87a12;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #13110e;
+    --card: #1c1915;
+    --sunken: #25211b;
+    --ink: #f0ebe0;
+    --muted: #a69d8e;
+    --line: #322c24;
+    --felt: #6cbf98;
+    --felt-soft: #1d3329;
+    --on-felt: #0f1b15;
+    --meeple: #f0875a;
+    --meeple-soft: #3a2117;
+    --gold: #e0b44a;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-sunken: var(--sunken);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-felt: var(--felt);
+  --color-felt-soft: var(--felt-soft);
+  --color-on-felt: var(--on-felt);
+  --color-meeple: var(--meeple);
+  --color-meeple-soft: var(--meeple-soft);
+  --color-gold: var(--gold);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-fraunces);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+::selection { background: var(--felt-soft); }
+
+:focus-visible { outline: 2px solid var(--felt); outline-offset: 2px; }
+
+input[type="range"] { accent-color: var(--felt); }
+
+.tabular { font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* Article typography for rendered Markdown. */
+.prose-ttc { line-height: 1.75; font-size: 1.0625rem; }
+.prose-ttc > * + * { margin-top: 1.1em; }
+.prose-ttc h2 { font-family: var(--font-fraunces), serif; font-size: 1.6rem; font-weight: 600; line-height: 1.25; margin-top: 2em; }
+.prose-ttc h3 { font-family: var(--font-fraunces), serif; font-size: 1.25rem; font-weight: 600; margin-top: 1.6em; }
+.prose-ttc a { color: var(--felt); text-decoration: underline; text-underline-offset: 3px; }
+.prose-ttc ul { list-style: disc; padding-left: 1.4em; }
+.prose-ttc ol { list-style: decimal; padding-left: 1.4em; }
+.prose-ttc li + li { margin-top: 0.35em; }
+.prose-ttc blockquote { border-left: 3px solid var(--felt); padding-left: 1em; color: var(--muted); }
+.prose-ttc code { font-family: var(--font-geist-mono), monospace; font-size: 0.9em; background: var(--sunken); padding: 0.1em 0.35em; border-radius: 4px; }
+.prose-ttc table { width: 100%; font-size: 0.9rem; border-collapse: collapse; display: block; overflow-x: auto; }
+.prose-ttc th, .prose-ttc td { border: 1px solid var(--line); padding: 0.4em 0.6em; text-align: left; }
+.prose-ttc hr { border-color: var(--line); }

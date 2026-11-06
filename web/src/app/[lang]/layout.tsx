@@ -1,0 +1,50 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { SiteHeader } from "@/components/site-header";
+import { getDict, hasLocale, locales } from "@/i18n";
+import { href } from "@/lib/i18n-paths";
+import { fontClasses } from "../fonts";
+import "../globals.css";
+
+export function generateStaticParams() {
+  return locales.map((lang) => ({ lang }));
+}
+
+export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Promise<Metadata> {
+  const { lang } = await params;
+  if (!hasLocale(lang)) return {};
+  const t = getDict(lang);
+  return {
+    metadataBase: process.env.VERCEL_PROJECT_PRODUCTION_URL ? new URL(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`) : undefined,
+    title: { default: t.meta.title, template: `%s · ${t.meta.title}` },
+    description: t.meta.description,
+    alternates: { languages: { id: "/id", en: "/en" } },
+  };
+}
+
+export default async function LangLayout({ children, params }: LayoutProps<"/[lang]">) {
+  const { lang } = await params;
+  if (!hasLocale(lang)) notFound();
+  const t = getDict(lang);
+  return (
+    <html lang={lang} className={fontClasses}>
+      <body className="flex min-h-full flex-col">
+        <SiteHeader lang={lang} t={t} />
+        <main className="flex-1">{children}</main>
+        <footer className="border-t border-line text-xs text-muted">
+          <div className="mx-auto flex max-w-6xl flex-wrap justify-between gap-2 px-4 py-4">
+            <span>
+              {t.footer.data}{" "}
+              <a className="underline hover:text-ink" href="https://boardgamegeek.com" target="_blank" rel="noreferrer">BoardGameGeek</a>
+            </span>
+            <span>
+              {t.footer.method} · <Link href={href(lang, "/method")} className="underline hover:text-ink">{t.footer.methodLink}</Link>
+              {" · "}<Link href="/admin" className="hover:text-ink">{t.nav.admin}</Link>
+            </span>
+          </div>
+        </footer>
+      </body>
+    </html>
+  );
+}

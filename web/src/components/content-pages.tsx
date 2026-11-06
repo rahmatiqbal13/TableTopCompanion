@@ -1,0 +1,151 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import { PageSkeleton } from "@/components/ui";
+import { GameCard, PostCard } from "@/components/cards";
+import { Markdown } from "@/components/markdown";
+import { YouTubeEmbed } from "@/components/youtube-embed";
+import { fmt, getDict, hasLocale, locales } from "@/i18n";
+import { getCatalog, getPublishedPost, getPublishedPosts } from "@/lib/data";
+import { formatDate } from "@/lib/format";
+import { href, postHref, postText } from "@/lib/i18n-paths";
+import type { PostType } from "@/lib/types";
+
+type ListProps = { params: Promise<{ lang: string }> };
+type DetailProps = { params: Promise<{ lang: string; slug: string }> };
+
+/** Builds the list page for one content section (news, reviews, videos, guides). */
+export function listing(type: PostType) {
+  async function generateMetadata({ params }: ListProps): Promise<Metadata> {
+    const { lang } = await params;
+    if (!hasLocale(lang)) return {};
+    const s = getDict(lang).posts.types[type];
+    return { title: s.title, description: s.intro, alternates: { languages: Object.fromEntries(locales.map((l) => [l, `/${l}/${type}`])) } };
+  }
+
+  async function Page({ params }: ListProps) {
+    const { lang } = await params;
+    if (!hasLocale(lang)) notFound();
+    const t = getDict(lang);
+    const posts = (await getPublishedPosts()).filter((p) => p.type === type);
+    const [lead, ...rest] = posts;
+    return (
+      <div className="mx-auto max-w-6xl px-4 pb-20 pt-10">
+        <h1 className="font-display text-4xl font-semibold tracking-tight">{t.posts.types[type].title}</h1>
+        <p className="mt-2 max-w-2xl text-muted">{t.posts.types[type].intro}</p>
+        {!lead ? (
+          <p className="mt-10 rounded-2xl border border-dashed border-line p-10 text-center text-muted">{t.posts.empty}</p>
+        ) : (
+          <>
+            <div className="mt-8 max-w-3xl"><PostCard post={lead} lang={lang} t={t} size="lg" /></div>
+            {rest.length > 0 && (
+              <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                {rest.map((p) => <PostCard key={p.id} post={p} lang={lang} t={t} />)}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    );
+  }
+  return { Page, generateMetadata };
+}
+
+/** Builds the article page for one content section. */
+export function detail(type: PostType) {
+  async function generateStaticParams() {
+    const slugs = (await getPublishedPosts()).filter((p) => p.type === type).map((p) => ({ slug: p.slug }));
+    // Cache Components needs at least one param to validate the route; the placeholder 404s.
+    return slugs.length ? slugs : [{ slug: "__none__" }];
+  }
+
+  async function generateMetadata({ params }: DetailProps): Promise<Metadata> {
+    const { lang, slug } = await params;
+    const post = hasLocale(lang) ? await getPublishedPost(slug) : null;
+    if (!post || post.type !== type || !hasLocale(lang)) return {};
+    const { text } = postText(post, lang);
+    const image = post.coverUrl ?? (post.youtubeId ? `https://i.ytimg.com/vi/${post.youtubeId}/hqdefault.jpg` : undefined);
+    return {
+      title: text.title,
+      description: text.excerpt,
+      alternates: {
+        canonical: postHref(lang, post),
+        languages: Object.fromEntries(locales.filter((l) => post.text[l]?.title).map((l) => [l, `/${l}/${type}/${slug}`])),
+      },
+      openGraph: { type: "article", title: text.title, description: text.excerpt, publishedTime: post.publishedAt ?? undefined, images: image ? [image] : undefined },
+    };
+  }
+
+  // The slug is URL data: stream the article behind a placeholder so client
+  // navigation to new (not prerendered) articles stays instant.
+  function Page({ params }: DetailProps) {
+    return <Suspense fallback={<PageSkeleton />}><Article params={params} /></Suspense>;
+  }
+
+  async function Article({ params }: DetailProps) {
+    const { lang, slug } = await params;
+    if (!hasLocale(lang)) notFound();
+    const post = await getPublishedPost(slug);
+    if (!post || post.type !== type) notFound();
+    const t = getDict(lang);
+    const { text, lang: textLang, fallback } = postText(post, lang);
+    const [catalog, all] = await Promise.all([getCatalog(), getPublishedPosts()]);
+    const games = post.gameIds.map((id) => catalog.games.find((g) => g.id === id)).filter((g) => g !== undefined);
+    const genres = new Map(catalog.genres.map((g) => [g.id, g]));
+    const more = all.filter((p) => p.type === type && p.id !== post.id).slice(0, 3);
+
+    return (
+      <div className="mx-auto max-w-6xl px-4 pb-20 pt-8">
+        <Link href={href(lang, `/${type}`)} className="text-sm text-muted underline">← {t.posts.types[type].title}</Link>
+        <article className="mx-auto mt-6 max-w-3xl">
+          <header>
+            <p className="text-xs font-medium uppercase tracking-wide text-felt">
+              {t.posts.types[type].singular}
+              {post.publishedAt && <span className="font-normal normal-case tracking-normal text-muted"> · {fmt(t.posts.published, { date: formatDate(t, post.publishedAt) })}</span>}
+            </p>
+            <h1 lang={textLang} className="mt-2 font-display text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">{text.title}</h1>
+            {text.excerpt && <p lang={textLang} className="mt-4 text-lg text-muted">{text.excerpt}</p>}
+          </header>
+          {fallback && <p className="mt-6 rounded-xl bg-sunken p-3 text-sm text-muted">{t.posts.onlyIn}</p>}
+          <div className="mt-8">
+            {post.youtubeId ? (
+              <YouTubeEmbed id={post.youtubeId} title={text.title} playLabel={fmt(t.posts.play, { title: text.title })} />
+            ) : post.coverUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- author covers from any host
+              <img src={post.coverUrl} alt="" className="w-full rounded-2xl" />
+            ) : null}
+          </div>
+          {post.score !== null && (
+            <div className="mt-8 flex items-center gap-4 rounded-2xl border border-felt/40 bg-card p-5">
+              <span className="font-display text-5xl font-semibold tabular text-felt">
+                {post.score.toLocaleString(t.intl, { maximumFractionDigits: 1 })}
+              </span>
+              <span className="text-sm text-muted">{t.game.editorScore}<br />/ 10</span>
+            </div>
+          )}
+          <div lang={textLang} className="mt-8">
+            <Markdown source={text.body} playLabel={fmt(t.posts.play, { title: text.title })} />
+          </div>
+          {games.length > 0 && (
+            <section className="mt-12">
+              <h2 className="mb-3 font-display text-xl font-semibold">{t.posts.gamesInPost}</h2>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {games.map((g) => <GameCard key={g.id} game={g} genre={genres.get(g.genreId)} lang={lang} t={t} />)}
+              </div>
+            </section>
+          )}
+        </article>
+        {more.length > 0 && (
+          <section className="mt-20 border-t border-line pt-10">
+            <h2 className="mb-6 font-display text-2xl font-semibold">{fmt(t.posts.more, { type: t.posts.types[type].title })}</h2>
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {more.map((p) => <PostCard key={p.id} post={p} lang={lang} t={t} />)}
+            </div>
+          </section>
+        )}
+      </div>
+    );
+  }
+  return { Page, generateMetadata, generateStaticParams };
+}

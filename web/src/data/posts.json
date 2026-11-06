@@ -1,0 +1,26 @@
+[
+ {
+  "id": 1,
+  "slug": "welcome-to-tabletop-companion",
+  "type": "guides",
+  "status": "published",
+  "publishedAt": "2026-11-06T00:00:00.000Z",
+  "coverUrl": null,
+  "youtubeId": null,
+  "score": null,
+  "gameIds": [],
+  "text": {
+   "id": {
+    "title": "Selamat datang di TableTop Companion",
+    "excerpt": "Cara memakai rekomendasi board game dan apa arti skor cocok.",
+    "body": "TableTop Companion membantu kamu memilih board game yang pas untuk malam ini, lalu menemani dengan ulasan, video, dan berita.\n\n## Cara memakai rekomendasi\n\n1. Buka **Rekomendasi** dan isi kondisi meja malam ini: jumlah pemain, pemain termuda, dan waktu yang tersedia.\n2. Atur **apa yang penting**. Geser bobot tiap kriteria, atau pakai pilihan cepat seperti *Malam keluarga*.\n3. Tambahkan **game favoritmu** supaya rekomendasi menyesuaikan seleramu.\n4. Bagikan tautannya ke teman. Semua pengaturan tersimpan di URL.\n\n## Kenapa ada skor \"cocok\"?\n\nSkor dihitung dengan **TOPSIS hibrida**: setiap game dibandingkan dengan game ideal sesuai pengaturanmu. Klik *Lihat perhitungan* untuk melihat setiap langkahnya.\n\n> Konten bersponsor tidak pernah mengubah skor rekomendasi.\n"
+   },
+   "en": {
+    "title": "Welcome to TableTop Companion",
+    "excerpt": "How to use the board game recommender and what the match score means.",
+    "body": "TableTop Companion helps you pick the right board game for tonight, then keeps you company with reviews, videos and news.\n\n## Using the recommender\n\n1. Open **Recommend** and set tonight's table: group size, youngest player and the time you have.\n2. Set **what matters**. Slide the weight of each criterion, or start from a preset like *Family night*.\n3. Add **games you love** so the picks lean toward your taste.\n4. Share the link with friends. Every setting lives in the URL.\n\n## Why a \"match\" score?\n\nScores come from **hybrid TOPSIS**: each game is compared with the ideal game for your settings. Open *Show the math* to see every step.\n\n> Sponsored content never changes recommendation scores.\n"
+   }
+  },
+  "updatedAt": "2026-11-06T00:00:00.000Z"
+ }
+]
