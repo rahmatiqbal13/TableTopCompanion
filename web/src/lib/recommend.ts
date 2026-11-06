@@ -1,12 +1,13 @@
 import { buildSimilarityIndex, type SimilarityIndex } from "./similarity";
-import { topsis, type TopsisResult } from "./topsis";
+import { topsisAbsolute, type AbsoluteTopsisResult } from "./topsis";
 import type { Catalog, Criterion, CriterionType, Game } from "./types";
 
 /*
  * Hybrid TOPSIS recommender
  * -------------------------
- * 1. Hard constraints remove games that cannot work tonight (group size,
- *    youngest player, time available, genre, year).
+ * 1. Constraints. Hard ones remove games that cannot work tonight (group size,
+ *    genre, year, far over the time limit or age). Soft ones keep games that
+ *    are only slightly over the time limit or recommended age, with a penalty.
  * 2. Criteria are built per candidate:
  *      - catalog criteria (rating, complexity, play time, ...); the rating is
  *        replaced by a Bayesian average when vote counts are known, so a
@@ -15,9 +16,12 @@ import type { Catalog, Criterion, CriterionType, Game } from "./types";
  *        plays at exactly that count, from BGG's "best with" poll;
  *      - "Taste match" (derived, needs favourites): content similarity to
  *        the games the user already loves.
- * 3. TOPSIS ranks candidates by closeness to the ideal solution.
- * 4. Optional MMR re-ranking trades a little score for variety so the top
- *    results are not near-duplicates of each other.
+ * 3. Each value becomes a utility in 0..1 on a fixed, catalog-wide scale and
+ *    TOPSIS measures closeness to the absolute ideal (all 1s). Scores do not
+ *    depend on which other games are in the list (no rank reversal).
+ * 4. Optional "Mix it up": near-identical games are folded under the
+ *    higher-ranked one ("Similar: …"), so the list shows more variety while
+ *    staying strictly in score order.
  */
 
 export interface CriterionPref {
@@ -131,8 +135,15 @@ export function defaultPreferences(catalog: Catalog): Preferences {
 }
 
 // ---------------------------------------------------------------------------
-// Step 1: hard constraints
+// Step 1: constraints (hard, plus soft tolerances for time and age)
 // ---------------------------------------------------------------------------
+
+/** A game may run up to 50% over the time limit, with a growing penalty. */
+export const TIME_TOLERANCE = 0.5;
+/** A game's recommended age may exceed the youngest player by up to 2 years. */
+export const AGE_TOLERANCE = 2;
+/** Score multiplier at the edge of a tolerance (linear from 1 at the limit). */
+const EDGE_PENALTY = 0.5;
 
 export type ExclusionReason = "players" | "age" | "time" | "genre" | "year" | "data" | "favourite";
 
@@ -147,9 +158,56 @@ export function exclusionReason(game: Game, prefs: Preferences, criteria: Criter
     if (v.minPlayers !== undefined && v.minPlayers > prefs.groupSize) return "players";
     if (game.maxPlayers !== null && game.maxPlayers < prefs.groupSize) return "players";
   }
-  if (prefs.youngestAge !== null && v.minAge !== undefined && v.minAge > prefs.youngestAge) return "age";
-  if (prefs.maxTime !== null && v.playTime !== undefined && v.playTime > prefs.maxTime) return "time";
+  if (prefs.youngestAge !== null && v.minAge !== undefined && v.minAge > prefs.youngestAge + AGE_TOLERANCE) return "age";
+  if (prefs.maxTime !== null && v.playTime !== undefined && v.playTime > prefs.maxTime * (1 + TIME_TOLERANCE)) return "time";
   return null;
+}
+
+export interface SoftResult {
+  /** Score multiplier, 0..1. */
+  penalty: number;
+  /** Minutes over the limit, when over. */
+  overTime?: number;
+  /** Years above the youngest player, when over. */
+  overAge?: number;
+}
+
+/** Penalty for games inside the soft tolerance but past the user's limit. */
+export function softPenalty(game: Game, prefs: Preferences): SoftResult {
+  const r: SoftResult = { penalty: 1 };
+  const t = game.values.playTime, a = game.values.minAge;
+  if (prefs.maxTime !== null && t > prefs.maxTime) {
+    r.overTime = t - prefs.maxTime;
+    r.penalty *= 1 - (1 - EDGE_PENALTY) * Math.min(1, r.overTime / (prefs.maxTime * TIME_TOLERANCE));
+  }
+  if (prefs.youngestAge !== null && a > prefs.youngestAge) {
+    r.overAge = a - prefs.youngestAge;
+    r.penalty *= 1 - (1 - EDGE_PENALTY) * Math.min(1, r.overAge / AGE_TOLERANCE);
+  }
+  return r;
+}
+
+// ---------------------------------------------------------------------------
+// Fixed scales: every criterion is mapped to a 0..1 utility on a scale that
+// spans the whole catalog, so it does not move when the user filters.
+// ---------------------------------------------------------------------------
+
+/** Criteria compared on a log scale: 15 vs 30 minutes matters more than 180 vs 195. */
+const LOG_SCALE = new Set(["playTime"]);
+const shape = (key: string, x: number) => (LOG_SCALE.has(key) ? Math.log2(Math.max(1, x)) : x);
+
+export interface Scale { lo: number; hi: number }
+
+export function utility(key: string, x: number, scale: Scale, pref: CriterionPref): number {
+  const v = shape(key, x), lo = shape(key, scale.lo), hi = shape(key, scale.hi);
+  const span = hi - lo;
+  if (!(span > 0)) return 1;
+  const pos = Math.min(1, Math.max(0, (v - lo) / span));
+  if (pref.type === "benefit") return pos;
+  if (pref.type === "cost") return 1 - pos;
+  const t = shape(key, pref.target ?? x);
+  const worst = Math.max(hi - t, t - lo, 1e-9);
+  return Math.max(0, 1 - Math.abs(v - t) / worst);
 }
 
 // ---------------------------------------------------------------------------
@@ -186,23 +244,28 @@ export function playerFit(game: Game, groupSize: number): number {
 
 export interface Recommendation {
   game: Game;
-  /** TOPSIS closeness, 0..1. */
+  /** Final score, 0..1: TOPSIS closeness × soft-constraint penalty. */
   score: number;
+  /** TOPSIS closeness before the penalty. */
+  fit: number;
+  soft: SoftResult;
   /** Final position (after diversity re-ranking, when enabled). */
   rank: number;
-  /** Criterion key -> 0..1 closeness to the best candidate on that criterion. */
+  /** Criterion key -> 0..1 utility on the criterion's fixed scale (1 = best possible). */
   closeness: Record<string, number>;
   /** Criterion key -> value used in the TOPSIS matrix. */
   used: Record<string, number>;
   /** Most similar favourite, for "because you like X". */
   because: { game: Game; shared: string[] } | null;
+  /** Near-identical, lower-scored games folded under this one ("Mix it up"). */
+  alike: Game[];
 }
 
 export interface RecommendationResult {
   items: Recommendation[];
   /** Active criteria (importance > 0 and applicable), in matrix column order. */
   used: Criterion[];
-  topsis: TopsisResult | null;
+  topsis: AbsoluteTopsisResult | null;
   /** Candidates in TOPSIS matrix row order. */
   candidates: Game[];
   excluded: Partial<Record<ExclusionReason, number>>;
@@ -266,19 +329,30 @@ export function recommend(catalog: Catalog, prefs: Preferences): RecommendationR
   };
 
   const matrix = candidates.map((g) => used.map((c) => valueOf(g, c.key)));
-  const specs = used.map((c) => {
-    const p = prefs.criteria[c.key];
-    return { weight: p.importance, type: p.type, target: p.type === "target" ? (p.target ?? 0) : undefined };
+
+  // Scales span the whole catalog (not just today's candidates) so filtering
+  // never moves them. Derived criteria are already 0..1.
+  const scales: Scale[] = used.map((c) => {
+    if (c.id < 0) return { lo: 0, hi: 1 };
+    const xs = catalog.games.map((g) => (c.key === "rating" ? (bayes.get(g.id) ?? g.values.rating) : g.values[c.key]))
+      .filter(Number.isFinite);
+    return { lo: Math.min(...xs), hi: Math.max(...xs) };
   });
-  const result = topsis(matrix, specs);
+  const utilities = matrix.map((row) => row.map((x, j) => utility(used[j].key, x, scales[j], prefs.criteria[used[j].key])));
+  const soft = candidates.map((g) => softPenalty(g, prefs));
+  const result = topsisAbsolute(matrix, utilities, used.map((c) => prefs.criteria[c.key].importance), soft.map((x) => x.penalty));
 
-  let order = result.order;
-  if (prefs.diversify) order = mmr(order, result.scores, candidates, sim);
+  const { top, alike } = prefs.diversify
+    ? foldSimilar(result.order, candidates, sim, result.scores)
+    : { top: result.order, alike: new Map<number, number[]>() };
 
-  const items = order.map((i, pos) => ({
+  const items = top.map((i, pos) => ({
     game: candidates[i],
     score: result.scores[i],
+    fit: result.fit[i],
+    soft: soft[i],
     rank: prefs.diversify ? pos + 1 : result.ranks[i],
+    alike: (alike.get(i) ?? []).map((k) => candidates[k]),
     closeness: Object.fromEntries(used.map((c, j) => [c.key, result.closeness[i][j]])),
     used: Object.fromEntries(used.map((c, j) => [c.key, matrix[i][j]])),
     because: because.get(candidates[i].id) ?? null,
@@ -286,32 +360,31 @@ export function recommend(catalog: Catalog, prefs: Preferences): RecommendationR
   return { items, used, topsis: result, candidates, excluded };
 }
 
+/** Similarity above which two games count as near-identical. */
+export const ALIKE_THRESHOLD = 0.9;
+
+/** Only fold a game whose score is within this distance of the game it folds under. */
+export const ALIKE_SCORE_BAND = 0.05;
+
 /**
- * Maximal Marginal Relevance over the top of the list:
- * next = argmax  λ·score − (1−λ)·redundancy,
- * where redundancy only counts similarity above `threshold` (rescaled to 0..1),
- * so merely related games are untouched and only near-duplicates get pushed down.
- * Only the first `window` positions are re-ordered; the tail keeps TOPSIS order.
+ * Folds near-identical games under the best-scored one. Walks the list in
+ * score order; a game that is near-identical to an already listed game and
+ * scores almost the same is attached to it (up to `maxAlike` per game)
+ * instead of taking its own slot. The listed games stay in strict score order.
  */
-export function mmr(
-  order: number[], scores: number[], games: Game[], sim: SimilarityIndex,
-  lambda = 0.8, window = 12, threshold = 0.6,
-): number[] {
-  const pool = order.slice(0, Math.min(order.length, window * 3));
-  const picked: number[] = [];
-  while (picked.length < Math.min(window, pool.length)) {
-    let bestIdx = -1, bestVal = -Infinity;
-    for (const i of pool) {
-      if (picked.includes(i)) continue;
-      const maxSim = picked.length ? Math.max(...picked.map((p) => sim.similarity(games[i], games[p]))) : 0;
-      const redundancy = Math.max(0, maxSim - threshold) / (1 - threshold);
-      const val = lambda * scores[i] - (1 - lambda) * redundancy;
-      if (val > bestVal) { bestVal = val; bestIdx = i; }
-    }
-    picked.push(bestIdx);
+export function foldSimilar(
+  order: number[], games: Game[], sim: SimilarityIndex, scores: number[],
+  threshold = ALIKE_THRESHOLD, band = ALIKE_SCORE_BAND, maxAlike = 3,
+): { top: number[]; alike: Map<number, number[]> } {
+  const top: number[] = [];
+  const alike = new Map<number, number[]>();
+  for (const i of order) {
+    const parent = top.find((p) =>
+      (alike.get(p)?.length ?? 0) < maxAlike && scores[p] - scores[i] <= band && sim.similarity(games[i], games[p]) >= threshold);
+    if (parent === undefined) top.push(i);
+    else alike.set(parent, [...(alike.get(parent) ?? []), i]);
   }
-  const rest = order.filter((i) => !picked.includes(i));
-  return [...picked, ...rest];
+  return { top, alike };
 }
 
 // ---------------------------------------------------------------------------
@@ -341,12 +414,15 @@ export function explain(rec: Recommendation, used: Criterion[], prefs: Preferenc
     .sort((a, b) => b.share * b.close - a.share * a.close)
     .slice(0, 2)
     .map((s) => describe(s.c, s.pref, rec, true, prefs));
-  const bad = scored
+  const soft: Reason[] = [];
+  if (rec.soft.overTime) soft.push({ key: "playTime", tone: "bad", code: "soft.time", value: rec.game.values.playTime });
+  if (rec.soft.overAge) soft.push({ key: "minAge", tone: "bad", code: "soft.age", value: rec.game.values.minAge });
+  const bad = soft.length ? soft : scored
     .filter((s) => s.close <= 0.3 && s.share >= 0.12)
     .sort((a, b) => b.share * (1 - b.close) - a.share * (1 - a.close))
     .slice(0, 1)
     .map((s) => describe(s.c, s.pref, rec, false, prefs));
-  return [...good, ...bad];
+  return [...good.filter((g) => !soft.some((x) => x.key === g.key)), ...bad];
 }
 
 const KNOWN = new Set(["minPlayers", "rating", "complexity", "playTime", "minAge"]);

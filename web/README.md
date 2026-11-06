@@ -32,6 +32,13 @@ but the admin cannot save. To edit locally, point `.env.local` at a Supabase pro
    ```
 4. `npm run db:setup` (creates tables, enables Row Level Security, adds the 140 games and a welcome post), then `npm run dev`.
 
+Troubleshooting:
+- `npm error enoent … package.json`: run commands inside the `web` folder (`cd web`).
+- `CONNECT_TIMEOUT … :6543`: some networks block port 6543. Locally, use the **Session pooler**
+  instead (same address, port **5432**). Vercel can keep using 6543.
+- Special characters in the database password (`@ # / ? [ ]`) must be URL-encoded (`@` → `%40`),
+  and the `[ ]` around `[YOUR-PASSWORD]` must be removed.
+
 ## Deploy to Vercel
 
 1. Import the repo in Vercel and set **Root Directory** to `web`.

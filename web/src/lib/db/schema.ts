@@ -1,4 +1,4 @@
-import { index, integer, jsonb, pgTable, real, serial, smallint, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { index, integer, uniqueIndex, jsonb, pgTable, real, serial, smallint, text, timestamp, varchar } from "drizzle-orm/pg-core";
 import type { Post } from "../types";
 
 export const genres = pgTable("genres", {
@@ -54,4 +54,25 @@ export const posts = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("posts_status_published_idx").on(t.status, t.publishedAt)],
+);
+
+/**
+ * Anonymous 👍/👎 on recommendations. One row per (browser session, game);
+ * voting again updates it. `query` holds the recommender URL parameters so a
+ * vote can be reproduced and compared across ranking methods.
+ */
+export const feedback = pgTable(
+  "feedback",
+  {
+    id: serial("id").primaryKey(),
+    sessionId: varchar("session_id", { length: 36 }).notNull(),
+    gameId: integer("game_id").notNull().references(() => games.id, { onDelete: "cascade" }),
+    vote: smallint("vote").notNull(),
+    rank: smallint("rank").notNull(),
+    score: real("score").notNull(),
+    query: text("query").notNull().default(""),
+    lang: varchar("lang", { length: 2 }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("feedback_session_game_idx").on(t.sessionId, t.gameId), index("feedback_created_idx").on(t.createdAt)],
 );

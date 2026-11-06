@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { sendFeedback } from "@/app/actions";
 import { fmt, type Dict, type Locale } from "@/i18n";
 import { criterionHint, criterionName, genreName, reasonText } from "@/lib/format";
 import { gameHref } from "@/lib/i18n-paths";
@@ -29,6 +30,8 @@ export function Recommender({ catalog, t, lang }: Ctx) {
   const result = useMemo(() => recommend(catalog, deferred), [catalog, deferred]);
   const [shown, setShown] = useState(PAGE);
   const ctx = { catalog, t, lang };
+  const votes = useVotes();
+  const query = useMemo(() => toSearchParams(deferred, catalog).toString(), [deferred, catalog]);
 
   // Keep the URL in sync so a result can be shared or bookmarked.
   useEffect(() => {
@@ -50,7 +53,7 @@ export function Recommender({ catalog, t, lang }: Ctx) {
     <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 pb-16 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
       <aside className="min-w-0 space-y-4 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:pr-1">
         <a href="#results" className="block rounded-xl bg-felt py-2.5 text-center text-sm font-medium text-on-felt lg:hidden">
-          {fmt(t.rec.seeResults, { n: result.items.length })}
+          {fmt(t.rec.seeResults, { n: result.candidates.length })}
         </a>
         <TonightPanel {...ctx} prefs={prefs} update={update} />
         <PriorityPanel {...ctx} prefs={prefs} setPrefs={setPrefs} setCriterion={setCriterion} update={update} />
@@ -59,7 +62,8 @@ export function Recommender({ catalog, t, lang }: Ctx) {
         <Summary {...ctx} result={result} prefs={deferred} update={update} />
         <ol className="space-y-3">
           {result.items.slice(0, shown).map((rec) => (
-            <ResultCard key={rec.game.id} {...ctx} rec={rec} result={result} prefs={deferred} />
+            <ResultCard key={rec.game.id} {...ctx} rec={rec} result={result} prefs={deferred}
+              feedback={catalog.live ? { vote: votes.get(rec.game.id), onVote: (v) => votes.cast(rec, v, query, lang) } : null} />
           ))}
         </ol>
         {result.items.length > shown && (
@@ -299,16 +303,74 @@ function Summary({ catalog, t, result, prefs, update }: Ctx & { result: Recommen
   }
   return (
     <p className="text-sm text-muted">
-      {fmt(t.rec.fit, { n: result.items.length, total: catalog.games.length })}
+      {fmt(t.rec.fit, { n: result.candidates.length, total: catalog.games.length })}
       {out.length > 0 && <> · {fmt(t.rec.filteredBy, { list: out.map(([r, n]) => `${t.rec.exclusion[r]} (${n})`).join(", ") })}</>}
     </p>
   );
 }
 
-function ResultCard({ rec, catalog, t, lang, result, prefs }: Ctx & { rec: Recommendation; result: RecommendationResult; prefs: Preferences }) {
+type Vote = 1 | -1;
+
+/** Anonymous per-browser id and votes, kept in localStorage. */
+function useVotes() {
+  const [votes, setVotes] = useState<Record<number, Vote>>({});
+  useEffect(() => {
+    try {
+      // Read after mount so server and client render the same markup.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setVotes(JSON.parse(localStorage.getItem("ttc-votes") ?? "{}"));
+    } catch { /* storage unavailable: start empty */ }
+  }, []);
+  const sessionId = () => {
+    try {
+      let id = localStorage.getItem("ttc-sid");
+      if (!id) localStorage.setItem("ttc-sid", (id = crypto.randomUUID()));
+      return id;
+    } catch {
+      return crypto.randomUUID();
+    }
+  };
+  return {
+    get: (gameId: number) => votes[gameId],
+    cast(rec: Recommendation, v: Vote, query: string, lang: Locale) {
+      const next = votes[rec.game.id] === v ? 0 : v;
+      const updated = { ...votes };
+      if (next === 0) delete updated[rec.game.id];
+      else updated[rec.game.id] = next;
+      setVotes(updated);
+      try { localStorage.setItem("ttc-votes", JSON.stringify(updated)); } catch { /* ignore */ }
+      void sendFeedback({ sessionId: sessionId(), gameId: rec.game.id, vote: next, rank: rec.rank, score: rec.score, query, lang });
+    },
+  };
+}
+
+function FeedbackButtons({ t, vote, onVote }: { t: Dict; vote: Vote | undefined; onVote: (v: Vote) => void }) {
+  const btn = (v: Vote, label: string, path: string) => (
+    <button type="button" aria-pressed={vote === v} aria-label={label} title={label} onClick={() => onVote(v)}
+      className={`grid size-8 place-items-center rounded-lg border transition-colors ${
+        vote === v ? (v === 1 ? "border-felt bg-felt text-on-felt" : "border-meeple bg-meeple text-paper") : "border-line text-muted hover:text-ink"
+      }`}>
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden><path fill="currentColor" d={path} /></svg>
+    </button>
+  );
+  const up = "M2 21h4V9H2v12Zm20-11a2 2 0 0 0-2-2h-6.3l1-4.6v-.3a1.5 1.5 0 0 0-.4-1L13.2 1 6.6 7.6A2 2 0 0 0 6 9v10a2 2 0 0 0 2 2h9a2 2 0 0 0 1.8-1.2l3-7.1c.1-.2.2-.5.2-.7v-2Z";
+  const down = "M22 3h-4v12h4V3ZM2 14a2 2 0 0 0 2 2h6.3l-1 4.6v.3c0 .4.2.8.4 1l1.1 1.1 6.6-6.6A2 2 0 0 0 18 15V5a2 2 0 0 0-2-2H7a2 2 0 0 0-1.8 1.2l-3 7.1L2 12v2Z";
+  return (
+    <div className="mt-3 flex items-center gap-2 text-xs text-muted">
+      <span>{vote ? t.rec.feedbackThanks : t.rec.feedbackQ}</span>
+      {btn(1, t.rec.feedbackUp, up)}
+      {btn(-1, t.rec.feedbackDown, down)}
+    </div>
+  );
+}
+
+function ResultCard({ rec, catalog, t, lang, result, prefs, feedback }: Ctx & {
+  rec: Recommendation; result: RecommendationResult; prefs: Preferences;
+  feedback: { vote: Vote | undefined; onVote: (v: Vote) => void } | null;
+}) {
   const g = rec.game;
   const genre = genreName(t, catalog.genres.find((x) => x.id === g.genreId));
-  const byKey = new Map(result.used.map((c) => [c.key, c]));
+  const byKey = new Map([...catalog.criteria, ...DERIVED].map((c) => [c.key, c]));
   const reasons = explain(rec, result.used, prefs);
   const pct = Math.round(rec.score * 100);
   const v = g.values;
@@ -350,6 +412,15 @@ function ResultCard({ rec, catalog, t, lang, result, prefs }: Ctx & { rec: Recom
             ))}
           </ul>
         )}
+        {rec.alike.length > 0 && (
+          <p className="mt-2 text-xs text-muted">
+            {t.rec.alike}{" "}
+            {rec.alike.map((a, k) => (
+              <span key={a.id}>{k > 0 && ", "}<Link href={gameHref(lang, a)} className="underline hover:text-ink">{a.name}</Link></span>
+            ))}
+          </p>
+        )}
+        {feedback && <FeedbackButtons t={t} vote={feedback.vote} onVote={feedback.onVote} />}
       </div>
     </li>
   );
@@ -376,7 +447,8 @@ function MathPanel({ t, result, prefs }: { t: Dict; result: RecommendationResult
   const [step, setStep] = useState<Step>("x");
   const [all, setAll] = useState(false);
   const tp = result.topsis!;
-  const rows = result.items.slice(0, all ? undefined : 15).map((it) => ({ it, i: result.candidates.indexOf(it.game) }));
+  // Every candidate in score order, including games folded under a look-alike.
+  const rows = tp.order.slice(0, all ? undefined : 15).map((i, k) => ({ it: { game: result.candidates[i], rank: k + 1 }, i }));
   const matrix = step === "x" ? tp.decision : step === "r" ? tp.normalized : tp.weighted;
   const f = (x: number) => (step === "x" ? (Number.isInteger(x) ? String(x) : x.toFixed(3)) : x.toFixed(4));
   const notes: Record<Step, string> = { x: t.rec.steps.xNote, r: t.rec.steps.rNote, y: t.rec.steps.yNote, d: t.rec.steps.dNote };
@@ -404,7 +476,9 @@ function MathPanel({ t, result, prefs }: { t: Dict; result: RecommendationResult
                 <th className="px-2 py-1.5">#</th>
                 <th className="px-2 py-1.5">{t.rec.game}</th>
                 {step === "d" ? (
-                  <><th className="px-2 py-1.5 text-right">D⁺</th><th className="px-2 py-1.5 text-right">D⁻</th><th className="px-2 py-1.5 text-right">V</th></>
+                  <><th className="px-2 py-1.5 text-right">D⁺</th><th className="px-2 py-1.5 text-right">D⁻</th>
+                    <th className="px-2 py-1.5 text-right">{t.rec.colFit}</th><th className="px-2 py-1.5 text-right">{t.rec.colPenalty}</th>
+                    <th className="px-2 py-1.5 text-right">{t.rec.colScore}</th></>
                 ) : result.used.map((c, j) => (
                   <th key={c.key} className="px-2 py-1.5 text-right font-medium">
                     {criterionName(t, c)}
@@ -420,7 +494,9 @@ function MathPanel({ t, result, prefs }: { t: Dict; result: RecommendationResult
                   <td className="max-w-48 truncate px-2 py-1">{it.game.name}</td>
                   {step === "d" ? (
                     <><td className="px-2 py-1 text-right">{tp.dPlus[i].toFixed(5)}</td><td className="px-2 py-1 text-right">{tp.dMinus[i].toFixed(5)}</td>
-                      <td className="px-2 py-1 text-right font-semibold">{tp.scores[i].toFixed(5)}</td></>
+                      <td className="px-2 py-1 text-right">{tp.fit[i].toFixed(4)}</td>
+                      <td className={`px-2 py-1 text-right ${tp.penalty[i] < 1 ? "text-meeple" : "text-muted"}`}>×{tp.penalty[i].toFixed(2)}</td>
+                      <td className="px-2 py-1 text-right font-semibold">{tp.scores[i].toFixed(4)}</td></>
                   ) : matrix[i].map((x, j) => <td key={j} className="px-2 py-1 text-right">{f(x)}</td>)}
                 </tr>
               ))}
@@ -433,9 +509,9 @@ function MathPanel({ t, result, prefs }: { t: Dict; result: RecommendationResult
             </tbody>
           </table>
         </div>
-        {result.items.length > 15 && (
+        {tp.order.length > 15 && (
           <button type="button" onClick={() => setAll((a) => !a)} className="text-xs text-muted underline">
-            {all ? t.rec.showTop : fmt(t.rec.showAllRows, { n: result.items.length })}
+            {all ? t.rec.showTop : fmt(t.rec.showAllRows, { n: tp.order.length })}
           </button>
         )}
         {prefs.diversify && <p className="text-xs text-muted">{t.rec.mixNote}</p>}

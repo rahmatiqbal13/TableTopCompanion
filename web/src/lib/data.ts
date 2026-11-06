@@ -1,6 +1,6 @@
 import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import seedCatalog from "@/data/seed.json";
 import seedPosts from "@/data/posts.json";
 import { db, hasDatabase } from "./db/client";
@@ -74,4 +74,39 @@ export async function getPublishedPost(slug: string): Promise<Post | null> {
 export async function getAllPostsForAdmin(): Promise<Post[]> {
   if (!hasDatabase) return seedPosts as Post[];
   return (await db().select().from(schema.posts).orderBy(desc(schema.posts.updatedAt))).map(toPost);
+}
+
+export interface FeedbackStats {
+  total: number;
+  up: number;
+  /** Helpful rate by result position: is the top of the list better? */
+  byRank: { bucket: string; total: number; up: number }[];
+  /** Helpful rate by match %: does a higher score mean a better pick? */
+  byScore: { bucket: string; total: number; up: number }[];
+  games: { id: number; name: string; up: number; down: number }[];
+  recent: { createdAt: string; game: string; vote: number; rank: number; score: number; query: string; lang: string }[];
+}
+
+/** Aggregates for /admin/feedback. Not cached. */
+export async function getFeedbackStats(): Promise<FeedbackStats | null> {
+  if (!hasDatabase) return null;
+  const d = db();
+  const f = schema.feedback, g = schema.games;
+  const up = sql<number>`count(*) filter (where ${f.vote} = 1)::int`;
+  const total = sql<number>`count(*)::int`;
+  const rankBucket = sql<string>`case when ${f.rank} <= 3 then '1–3' when ${f.rank} <= 10 then '4–10' else '11+' end`;
+  const scoreBucket = sql<string>`case when ${f.score} >= 0.7 then '≥ 70%' when ${f.score} >= 0.5 then '50–69%' else '< 50%' end`;
+  const [[totals], byRank, byScore, games, recent] = await Promise.all([
+    d.select({ total, up }).from(f),
+    d.select({ bucket: rankBucket, total, up }).from(f).groupBy(rankBucket).orderBy(sql`min(${f.rank})`),
+    d.select({ bucket: scoreBucket, total, up }).from(f).groupBy(scoreBucket).orderBy(sql`min(${f.score}) desc`),
+    d.select({ id: g.id, name: g.name, up, down: sql<number>`count(*) filter (where ${f.vote} = -1)::int` })
+      .from(f).innerJoin(g, eq(f.gameId, g.id)).groupBy(g.id, g.name).orderBy(sql`count(*) desc`).limit(30),
+    d.select({ createdAt: f.createdAt, game: g.name, vote: f.vote, rank: f.rank, score: f.score, query: f.query, lang: f.lang })
+      .from(f).innerJoin(g, eq(f.gameId, g.id)).orderBy(desc(f.createdAt)).limit(20),
+  ]);
+  return {
+    total: totals.total, up: totals.up, byRank, byScore, games,
+    recent: recent.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() })),
+  };
 }

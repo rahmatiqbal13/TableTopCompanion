@@ -31,4 +31,17 @@ it("migrates, seeds, and keeps sequences usable", async () => {
   expect(post.text.id?.title).toBe("Ulasan");
   expect(post.text.en).toBeUndefined();
   await expect(db.insert(schema.posts).values({ slug: "ulasan-sushi-go", type: "news", text: {} })).rejects.toThrow();
+
+  // Feedback: one vote per (session, game); voting again updates it.
+  const sid = "6f1c6a9e-2b4d-4c55-9a51-1f2e3d4c5b6a";
+  const vote = (v: number) => db.insert(schema.feedback)
+    .values({ sessionId: sid, gameId: created.id, vote: v, rank: 1, score: 0.8, query: "", lang: "id" })
+    .onConflictDoUpdate({ target: [schema.feedback.sessionId, schema.feedback.gameId], set: { vote: v } });
+  await vote(1);
+  await vote(-1);
+  const rows = await db.select().from(schema.feedback);
+  expect(rows).toHaveLength(1);
+  expect(rows[0].vote).toBe(-1);
+  await db.delete(schema.games).where(eq(schema.games.id, created.id));
+  expect(await db.select().from(schema.feedback)).toHaveLength(0); // cascades with the game
 });

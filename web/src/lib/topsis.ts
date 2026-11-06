@@ -104,3 +104,56 @@ export function topsis(matrix: number[][], criteria: TopsisCriterion[]): TopsisR
 
   return { weights, decision, normalized, weighted, idealBest, idealWorst, dPlus, dMinus, scores, ranks, order, closeness };
 }
+
+export interface AbsoluteTopsisResult extends TopsisResult {
+  /** TOPSIS closeness before penalties, 0..1. */
+  fit: number[];
+  /** Soft-constraint multiplier per alternative, 0..1 (1 = no penalty). */
+  penalty: number[];
+}
+
+/**
+ * TOPSIS against fixed reference points.
+ *
+ * Input values are already utilities in 0..1 (1 = best possible on that
+ * criterion's fixed scale). The ideal best is "1 on every criterion" and the
+ * ideal worst is "0 on every criterion", so an alternative's score depends only
+ * on its own values: adding, removing or filtering other alternatives can never
+ * change its score or swap the order of two others (no rank reversal), and a
+ * score of 0.9 means "close to the best possible", not "best of today's list".
+ *
+ * Final score = closeness × penalty (soft constraints).
+ */
+export function topsisAbsolute(
+  raw: number[][],
+  utilities: number[][],
+  weightsIn: number[],
+  penalty: number[] = utilities.map(() => 1),
+): AbsoluteTopsisResult {
+  const n = weightsIn.length;
+  const clean = weightsIn.map((w) => (Number.isFinite(w) && w > 0 ? w : 0));
+  const total = clean.reduce((a, b) => a + b, 0);
+  const weights = total > 0 ? clean.map((w) => w / total) : clean.map(() => 1 / n);
+
+  const u = utilities.map((row) => row.map((x) => Math.min(1, Math.max(0, Number.isFinite(x) ? x : 0))));
+  const weighted = u.map((row) => row.map((x, j) => x * weights[j]));
+  const idealBest = weights.slice();
+  const idealWorst = weights.map(() => 0);
+  const dist = (row: number[], ref: number[]) => Math.sqrt(row.reduce((s, y, j) => s + (y - ref[j]) ** 2, 0));
+  const dPlus = weighted.map((row) => dist(row, idealBest));
+  const dMinus = weighted.map((row) => dist(row, idealWorst));
+  const fit = dPlus.map((dp, i) => (dp + dMinus[i] > EPS ? dMinus[i] / (dp + dMinus[i]) : 1));
+  const scores = fit.map((f, i) => f * Math.min(1, Math.max(0, penalty[i] ?? 1)));
+
+  const order = scores.map((_, i) => i).sort((a, b) => scores[b] - scores[a] || a - b);
+  const ranks = new Array<number>(scores.length);
+  order.forEach((idx, pos) => {
+    const prev = order[pos - 1];
+    ranks[idx] = pos > 0 && Math.abs(scores[prev] - scores[idx]) < 1e-9 ? ranks[prev] : pos + 1;
+  });
+
+  return {
+    weights, decision: raw, normalized: u, weighted, idealBest, idealWorst,
+    dPlus, dMinus, fit, penalty, scores, ranks, order, closeness: u,
+  };
+}

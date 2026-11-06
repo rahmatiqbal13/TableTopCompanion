@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { topsis } from "../topsis";
+import { topsis, topsisAbsolute } from "../topsis";
 import seed from "../../data/seed.json";
 
 describe("topsis", () => {
@@ -62,5 +62,19 @@ describe("topsis", () => {
       crit.map((c) => ({ weight: c.defaultWeight, type: c.type as "benefit" | "cost" })),
     );
     r.scores.forEach((s, i) => expect(s).toBeCloseTo(legacy[i], 9));
+  });
+});
+
+describe("topsisAbsolute", () => {
+  it("scores against fixed ideals and applies penalties", () => {
+    const r = topsisAbsolute([[0], [0], [0]], [[1, 1], [0, 0], [1, 0]], [1, 1], [1, 1, 0.5]);
+    expect(r.fit).toEqual([1, 0, 0.5]);
+    expect(r.scores).toEqual([1, 0, 0.25]);
+    expect(r.order).toEqual([0, 2, 1]);
+  });
+  it("gives each alternative the same score regardless of the others", () => {
+    const a = topsisAbsolute([[0]], [[0.3, 0.9]], [2, 1]).scores[0];
+    const b = topsisAbsolute([[0], [0]], [[0.3, 0.9], [1, 0]], [2, 1]).scores[0];
+    expect(a).toBeCloseTo(b, 15);
   });
 });

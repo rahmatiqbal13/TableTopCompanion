@@ -10,6 +10,7 @@ export default function AdminLayout({ children }: LayoutProps<"/admin">) {
   const links = [
     { href: "/admin", label: "Catalog" },
     { href: "/admin/posts", label: "Posts" },
+    { href: "/admin/feedback", label: "Feedback" },
   ];
   return (
     <html lang="en" className={fontClasses}>

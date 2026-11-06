@@ -21,8 +21,11 @@ function create(): Db {
   const client = postgres(url, {
     // Supabase's transaction pooler (port 6543) does not support prepared statements.
     prepare: false,
-    // Serverless functions each hold their own pool; keep it tiny.
-    max: process.env.VERCEL ? 1 : 3,
+    // One connection per process (postgres.js pipelines queries over it).
+    // Builds run ~9 workers and Supabase's session pooler allows 15 clients,
+    // so a bigger pool per process quickly hits "max clients reached".
+    max: 1,
+    idle_timeout: 20,
     ssl: local ? false : "require",
   });
   return drizzle(client, { schema });
