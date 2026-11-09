@@ -1,12 +1,12 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import { revalidateTag } from "next/cache";
 import type { NextRequest } from "next/server";
-import { CATALOG_TAG, POSTS_TAG } from "@/lib/data";
+import { CATALOG_TAG, LOCAL_TAG, POSTS_TAG } from "@/lib/data";
 
 /** Which cached data each table feeds. */
 const TAGS: Record<string, string[]> = {
   games: [CATALOG_TAG], genres: [CATALOG_TAG], criteria: [CATALOG_TAG],
-  user_games: [CATALOG_TAG], profiles: [CATALOG_TAG], posts: [POSTS_TAG],
+  user_games: [CATALOG_TAG], profiles: [CATALOG_TAG], posts: [POSTS_TAG], local_listings: [LOCAL_TAG],
 };
 
 const digest = (s: string) => createHash("sha256").update(s).digest();
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   try {
     table = String(((await req.json()) as { table?: unknown }).table ?? "");
   } catch { /* empty or non-JSON body: clear everything */ }
-  const tags = TAGS[table] ?? [CATALOG_TAG, POSTS_TAG];
+  const tags = TAGS[table] ?? [CATALOG_TAG, POSTS_TAG, LOCAL_TAG];
   for (const tag of tags) revalidateTag(tag, { expire: 0 });
   return Response.json({ ok: true, revalidated: tags });
 }

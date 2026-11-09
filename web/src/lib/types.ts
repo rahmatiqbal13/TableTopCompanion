@@ -58,11 +58,25 @@ export interface Catalog {
 export const POST_TYPES = ["news", "reviews", "videos", "guides"] as const;
 export type PostType = (typeof POST_TYPES)[number];
 
+export const VIDEO_FORMATS = ["long", "short"] as const;
+export type VideoFormat = (typeof VIDEO_FORMATS)[number];
+
+export const REVIEW_SOURCES = ["bought", "publisher", "borrowed"] as const;
+export type ReviewSource = (typeof REVIEW_SOURCES)[number];
+
+export const SUBSCORE_KEYS = ["teach", "interaction", "replay"] as const;
+/** 0..10 per aspect; a key is missing when the editor left it blank. */
+export type SubScores = Partial<Record<(typeof SUBSCORE_KEYS)[number], number>>;
+
 export interface PostText {
   title: string;
   excerpt: string;
   /** Markdown. */
   body: string;
+  /** Reviews: who the game is great for. */
+  forWho?: string;
+  /** Reviews: who should pass. */
+  skip?: string;
 }
 
 export interface Post {
@@ -74,10 +88,49 @@ export interface Post {
   coverUrl: string | null;
   /** YouTube video id (11 chars), not the URL. */
   youtubeId: string | null;
+  /** TikTok video id (digits), not the URL. A post has at most one video. */
+  tiktokId: string | null;
+  videoFormat: VideoFormat;
+  durationSec: number | null;
   /** Editor's score 0..10, for reviews. */
   score: number | null;
+  /** How the reviewer got the copy, for reviews. */
+  reviewSource: ReviewSource | null;
+  subscores: SubScores;
   gameIds: number[];
   /** Per-language text; at least one language is present. */
   text: { id?: PostText; en?: PostText };
+  updatedAt: string;
+}
+
+/** Doubles as the URL segment: /local/cafes, /local/communities, /local/games. */
+export const LOCAL_KINDS = ["cafes", "communities", "games"] as const;
+export type LocalKind = (typeof LOCAL_KINDS)[number];
+export const isLocalKind = (x: string): x is LocalKind => (LOCAL_KINDS as readonly string[]).includes(x);
+
+export interface LocalText {
+  summary: string;
+  schedule: string;
+  /** Markdown. */
+  body: string;
+}
+
+/** A café, community or Indonesian-made game in the "Play near you" directory. */
+export interface LocalListing {
+  id: number;
+  slug: string;
+  kind: LocalKind;
+  status: "draft" | "published";
+  name: string;
+  city: string;
+  address: string | null;
+  mapUrl: string | null;
+  websiteUrl: string | null;
+  instagramUrl: string | null;
+  contact: string | null;
+  imageUrl: string | null;
+  designer: string | null;
+  gameId: number | null;
+  text: { id?: LocalText; en?: LocalText };
   updatedAt: string;
 }

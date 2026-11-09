@@ -1,27 +1,33 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ReviewVerdict, ShortsRail } from "@/components/cards";
 import { Cover } from "@/components/cover";
 import { TonightTable } from "@/components/tonight-table";
 import { getDict, hasLocale, type Dict, type Locale } from "@/i18n";
-import { getCatalog, getPublishedPosts } from "@/lib/data";
+import { getCatalog, getPublishedListings, getPublishedPosts } from "@/lib/data";
 import { criterionName, formatDate, formatValue } from "@/lib/format";
 import { href, postHref, postText } from "@/lib/i18n-paths";
-import { youTubeThumb } from "@/lib/youtube";
-import type { Catalog, Game, Post, PostType } from "@/lib/types";
+import { formatDuration, postThumb } from "@/lib/video";
+import { LOCAL_KINDS, SUBSCORE_KEYS, type Catalog, type Game, type Post, type PostType } from "@/lib/types";
 
 const eyebrow = "font-mono text-xs uppercase tracking-[0.12em] text-felt";
 const SCORE_SHEET_KEYS = ["rating", "complexity", "playTime"];
+const LOCAL_SWATCH = { cafes: "#163f31", communities: "#b9471a", games: "#a87a12" };
 
 export default async function Home({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
   const t = getDict(lang);
-  const [full, posts] = await Promise.all([getCatalog(), getPublishedPosts()]);
+  const [full, posts, listings] = await Promise.all([getCatalog(), getPublishedPosts(), getPublishedListings()]);
   // Descriptions are not needed for ranking; keep the client payload small.
   const catalog: Catalog = { ...full, games: full.games.map((g) => ({ ...g, description: null })) };
   const byType = (type: PostType, n: number) => posts.filter((p) => p.type === type).slice(0, n);
   const [feature, ...moreReviews] = byType("reviews", 3);
-  const videos = byType("videos", 3), news = byType("news", 4), guides = byType("guides", 3);
+  const news = byType("news", 4), guides = byType("guides", 3);
+  const allVideos = posts.filter((p) => p.type === "videos");
+  const shorts = allVideos.filter((p) => p.videoFormat === "short").slice(0, 8);
+  const videos = allVideos.filter((p) => p.videoFormat !== "short").slice(0, 3);
+  const localKinds = LOCAL_KINDS.filter((kind) => listings.some((l) => l.kind === kind));
   const games = new Map(catalog.games.map((g) => [g.id, g]));
   const gameOf = (p: Post) => games.get(p.gameIds[0]);
   const shortDate = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString(t.intl, { day: "numeric", month: "short" }) : "");
@@ -43,11 +49,38 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         </section>
       )}
 
-      {videos.length > 0 && (
+      {allVideos.length > 0 && (
         <section className="mx-auto max-w-6xl px-4 pb-10 pt-[72px]">
           <Heading title={t.nav.videos} to={href(lang, "/videos")} seeAll={t.home.seeAll} />
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {videos.map((p) => <VideoCard key={p.id} post={p} game={gameOf(p)} lang={lang} t={t} />)}
+          {shorts.length > 0 && <div className={videos.length ? "mb-10" : ""}><ShortsRail posts={shorts} lang={lang} t={t} /></div>}
+          {videos.length > 0 && (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {videos.map((p) => <VideoCard key={p.id} post={p} game={gameOf(p)} lang={lang} t={t} />)}
+            </div>
+          )}
+        </section>
+      )}
+
+      {localKinds.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 pb-10 pt-[72px]">
+          <div className="grid gap-8 rounded-3xl bg-table-ink p-[clamp(28px,5vw,52px)] text-on-table lg:grid-cols-2">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-table-gold">{t.home.local.kicker}</p>
+              <h2 className="mt-3 text-balance font-display text-[clamp(30px,3.6vw,44px)] font-bold leading-[1.05] tracking-[-0.035em]">{t.home.local.title}</h2>
+              <p className="mt-3.5 max-w-[44ch] leading-relaxed text-[#cfc6b6]">{t.home.local.body}</p>
+            </div>
+            <div className="grid content-start gap-2.5">
+              {localKinds.map((kind) => (
+                <Link key={kind} href={href(lang, `/local/${kind}`)} className="flex min-h-16 items-center gap-4 rounded-2xl border border-on-table/10 bg-on-table/5 px-[18px] py-3.5 transition-colors hover:bg-on-table/15">
+                  <span aria-hidden className="size-10 shrink-0 rounded-xl" style={{ background: LOCAL_SWATCH[kind] }} />
+                  <span className="flex-1">
+                    <span className="block font-semibold">{t.local.types[kind].title}</span>
+                    <span className="mt-0.5 block text-sm text-[#cfc6b6]">{t.local.types[kind].sub}</span>
+                  </span>
+                  <span aria-hidden>→</span>
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
       )}
@@ -124,8 +157,7 @@ function Heading({ title, to, seeAll, tight }: { title: string; to: string; seeA
 }
 
 /** Best available picture: the post's own cover, its video, then the game it is about. */
-const artFor = (post: Post, game?: Game) =>
-  post.coverUrl ?? (post.youtubeId ? youTubeThumb(post.youtubeId) : null) ?? game?.imageUrl ?? null;
+const artFor = (post: Post, game?: Game) => postThumb(post) ?? game?.imageUrl ?? null;
 
 function FeatureReview({ post, game, lang, t }: { post: Post; game?: Game; lang: Locale; t: Dict }) {
   const { text, lang: textLang } = postText(post, lang);
@@ -139,14 +171,19 @@ function FeatureReview({ post, game, lang, t }: { post: Post; game?: Game; lang:
         <p className={eyebrow}>{label}{post.publishedAt && <span className="text-muted"> · {formatDate(t, post.publishedAt)}</span>}</p>
         <h3 lang={textLang} className="mt-2.5 text-balance font-display text-[clamp(28px,3.2vw,40px)] font-bold leading-[1.05] tracking-[-0.03em]">{text.title}</h3>
         {text.excerpt && <p lang={textLang} className="mt-3 max-w-[52ch] text-pretty text-[17px] leading-relaxed text-muted">{text.excerpt}</p>}
+        <div className="mt-[18px]"><ReviewVerdict post={post} text={text} textLang={textLang} t={t} /></div>
       </div>
     </Link>
   );
 }
 
-/** The editor's score next to the game's own numbers. Renders nothing when there are neither. */
+/** The editor's score with the sub-scores, or the game's own numbers when those weren't filled in. Renders nothing when there are neither. */
 function ScoreSheet({ post, game, catalog, t }: { post: Post; game?: Game; catalog: Catalog; t: Dict }) {
-  const rows = game
+  const subs = SUBSCORE_KEYS.flatMap((key) => {
+    const v = post.subscores[key];
+    return v === undefined ? [] : [{ key, label: t.posts.review.subs[key], value: String(v) }];
+  });
+  const rows = subs.length ? subs : game
     ? SCORE_SHEET_KEYS.flatMap((key) => {
         const c = catalog.criteria.find((x) => x.key === key), v = game.values[key];
         return c && Number.isFinite(v) ? [{ key, label: criterionName(t, c), value: formatValue(t, c, v) }] : [];
@@ -201,8 +238,9 @@ function VideoCard({ post, game, lang, t }: { post: Post; game?: Game; lang: Loc
   const { text, lang: textLang } = postText(post, lang);
   return (
     <Link href={postHref(lang, post)} className="grid gap-3.5">
-      <div className="relative grid aspect-video place-items-center overflow-hidden rounded-2xl">
+      <div className="relative grid aspect-video place-items-center overflow-hidden rounded-2xl bg-sunken">
         <Cover name={game?.name ?? text.title} src={artFor(post, game)} fillText={54} faint />
+        {post.durationSec !== null && <span className="tabular absolute bottom-2.5 right-2.5 rounded-md bg-black/65 px-2 py-0.5 font-mono text-xs text-white">{formatDuration(post.durationSec)}</span>}
         <span aria-hidden className="absolute grid size-14 place-items-center rounded-full bg-[#f4efe4] text-[#1f1b16] shadow-[0_8px_20px_rgba(0,0,0,0.3)]">
           <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M8 5v14l11-7z" /></svg>
         </span>

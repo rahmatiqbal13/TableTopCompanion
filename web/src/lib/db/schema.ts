@@ -1,5 +1,5 @@
 import { boolean, index, integer, primaryKey, uniqueIndex, uuid, jsonb, pgTable, real, serial, smallint, text, timestamp, varchar } from "drizzle-orm/pg-core";
-import type { Post } from "../types";
+import { LOCAL_KINDS, REVIEW_SOURCES, VIDEO_FORMATS, type LocalListing, type Post, type SubScores } from "../types";
 
 export const genres = pgTable("genres", {
   id: serial("id").primaryKey(),
@@ -48,7 +48,12 @@ export const posts = pgTable(
     publishedAt: timestamp("published_at", { withTimezone: true }),
     coverUrl: text("cover_url"),
     youtubeId: varchar("youtube_id", { length: 11 }),
+    tiktokId: varchar("tiktok_id", { length: 32 }),
+    videoFormat: varchar("video_format", { length: 5, enum: VIDEO_FORMATS }).notNull().default("long"),
+    durationSec: integer("duration_sec"),
     score: real("score"),
+    reviewSource: varchar("review_source", { length: 12, enum: REVIEW_SOURCES }),
+    subscores: jsonb("subscores").$type<SubScores>().notNull().default({}),
     gameIds: jsonb("game_ids").$type<number[]>().notNull().default([]),
     text: jsonb("text").$type<Post["text"]>().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
@@ -104,4 +109,28 @@ export const userGames = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.gameId] }), index("user_games_game_idx").on(t.gameId)],
+);
+
+/** "Play near you": cafés, communities and Indonesian-made games, managed in /admin/local. */
+export const localListings = pgTable(
+  "local_listings",
+  {
+    id: serial("id").primaryKey(),
+    slug: varchar("slug", { length: 120 }).notNull().unique(),
+    kind: varchar("kind", { length: 12, enum: LOCAL_KINDS }).notNull(),
+    status: varchar("status", { length: 10, enum: ["draft", "published"] }).notNull().default("draft"),
+    name: varchar("name", { length: 160 }).notNull(),
+    city: varchar("city", { length: 80 }).notNull().default(""),
+    address: text("address"),
+    mapUrl: text("map_url"),
+    websiteUrl: text("website_url"),
+    instagramUrl: text("instagram_url"),
+    contact: varchar("contact", { length: 120 }),
+    imageUrl: text("image_url"),
+    designer: varchar("designer", { length: 120 }),
+    gameId: integer("game_id").references(() => games.id, { onDelete: "set null" }),
+    text: jsonb("text").$type<LocalListing["text"]>().notNull().default({}),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("local_listings_kind_status_idx").on(t.kind, t.status)],
 );

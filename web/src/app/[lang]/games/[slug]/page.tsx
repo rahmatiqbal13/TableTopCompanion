@@ -6,12 +6,13 @@ import { GameCard, PostCard } from "@/components/cards";
 import { Cover } from "@/components/cover";
 import { GameUserPanel } from "@/components/game-user-panel";
 import { PageSkeleton, SectionHeading } from "@/components/ui";
-import { YouTubeEmbed } from "@/components/youtube-embed";
+import { VideoPlayer } from "@/components/video-player";
 import { fmt, getDict, hasLocale, locales, type Dict } from "@/i18n";
 import { getCatalog, getPublishedPosts } from "@/lib/data";
 import { gameSlug, genreName } from "@/lib/format";
 import { gameHref, href, postHref, postText } from "@/lib/i18n-paths";
 import { similarityFor } from "@/lib/recommend";
+import { isPortrait, postThumb, postVideo } from "@/lib/video";
 import type { Catalog, Game } from "@/lib/types";
 
 export async function generateStaticParams() {
@@ -57,8 +58,8 @@ async function GameHub({ params }: { params: Promise<{ lang: string; slug: strin
   const t = getDict(lang);
   const posts = (await getPublishedPosts()).filter((p) => p.gameIds.includes(game.id));
   const review = posts.find((p) => p.type === "reviews");
-  const videos = posts.filter((p) => p.youtubeId);
-  const related = posts.filter((p) => p !== review && !p.youtubeId);
+  const videos = posts.filter((p) => postVideo(p));
+  const related = posts.filter((p) => p !== review && !postVideo(p));
   const genres = new Map(catalog.genres.map((g) => [g.id, g]));
 
   const sim = similarityFor(catalog.games);
@@ -116,7 +117,7 @@ async function GameHub({ params }: { params: Promise<{ lang: string; slug: strin
                   const { text } = postText(p, lang);
                   return (
                     <div key={p.id} className="space-y-2">
-                      <YouTubeEmbed id={p.youtubeId!} title={text.title} playLabel={fmt(t.posts.play, { title: text.title })} />
+                      <VideoPlayer video={postVideo(p)!} thumb={postThumb(p)} portrait={isPortrait(p)} title={text.title} playLabel={fmt(t.posts.play, { title: text.title })} />
                       <Link href={postHref(lang, p)} className="font-medium hover:underline">{text.title}</Link>
                     </div>
                   );

@@ -30,7 +30,14 @@ it("migrates, seeds, and keeps sequences usable", async () => {
   }).returning();
   expect(post.text.id?.title).toBe("Ulasan");
   expect(post.text.en).toBeUndefined();
+  expect(post).toMatchObject({ tiktokId: null, videoFormat: "long", durationSec: null, reviewSource: null, subscores: {} });
   await expect(db.insert(schema.posts).values({ slug: "ulasan-sushi-go", type: "news", text: {} })).rejects.toThrow();
+
+  // Directory: slugs are unique, and removing a game only unlinks it.
+  const [local] = await db.insert(schema.localListings)
+    .values({ kind: "games", slug: "game-lokal", name: "Game Lokal", gameId: created.id }).returning();
+  expect(local).toMatchObject({ status: "draft", city: "", text: {} });
+  await expect(db.insert(schema.localListings).values({ kind: "cafes", slug: "game-lokal", name: "Kafe" })).rejects.toThrow();
 
   // Feedback: one vote per (session, game); voting again updates it.
   const sid = "6f1c6a9e-2b4d-4c55-9a51-1f2e3d4c5b6a";
@@ -44,6 +51,7 @@ it("migrates, seeds, and keeps sequences usable", async () => {
   expect(rows[0].vote).toBe(-1);
   await db.delete(schema.games).where(eq(schema.games.id, created.id));
   expect(await db.select().from(schema.feedback)).toHaveLength(0); // cascades with the game
+  expect((await db.select().from(schema.localListings))[0].gameId).toBeNull();
 
   // Accounts: one row per (user, game); removing a profile removes their shelf.
   const uid = "0b6c7a3e-9a1d-4c2e-8f3b-5d6e7f8a9b0c";

@@ -25,6 +25,10 @@ export const id: Dict = {
     noneTitle: "Belum ada game yang muat", noneBody: "Coba kurangi pemain atau tambah waktunya.", reset: "Atur ulang meja",
     seeAll: "Lihat semua", ctaFind: "Cari game", ctaBrowse: "Lihat semua game",
     scoresheet: "Lembar skor", editor: "skor editor",
+    local: {
+      kicker: "Main di sekitarmu", title: "Ketemu meja dan teman main baru.",
+      body: "Kafe board game, komunitas kota, dan toko lokal. Kami arahkan kamu ke mereka, termasuk game buatan Indonesia.",
+    },
     method: {
       kicker: "Cara kerja", title: "Setiap rekomendasi ada alasannya.",
       body: "Skor cocok dihitung dengan TOPSIS hibrida: tiap game dibandingkan dengan game ideal untuk pengaturanmu. Semua langkahnya bisa kamu buka.",
@@ -83,6 +87,18 @@ export const id: Dict = {
     alike: "Mirip:", feedbackQ: "Rekomendasi bagus?", feedbackUp: "Cocok", feedbackDown: "Kurang cocok", feedbackThanks: "Terima kasih atas masukannya!",
     showTop: "Tampilkan 15 teratas", showAllRows: "Tampilkan semua {n} baris",
     mixNote: "Tabel ini memuat semua game yang cocok menurut skor, termasuk yang dikelompokkan oleh “Variasikan”.",
+  },
+  local: {
+    title: "Main di sekitarmu",
+    intro: "Kafe board game, komunitas kota, dan game buatan Indonesia.",
+    types: {
+      cafes: { title: "Kafe board game", sub: "Cari di kotamu", intro: "Tempat untuk duduk dan langsung main." },
+      communities: { title: "Komunitas kota", sub: "Jadwal kumpul mingguan", intro: "Kelompok yang rutin kumpul main dan terbuka untuk pemain baru." },
+      games: { title: "Game buatan Indonesia", sub: "Karya desainer lokal", intro: "Board game yang dirancang dan diterbitkan di Indonesia." },
+    },
+    empty: "Belum ada yang terdaftar di sini. Cek lagi nanti.", allCities: "Semua kota", count: "{n} terdaftar",
+    address: "Alamat", map: "Buka di Maps", website: "Situs", instagram: "Instagram", contact: "Kontak",
+    schedule: "Jadwal", designer: "Desainer", catalog: "Lihat di katalog",
   },
   presets: {
     balanced: { label: "Seimbang", description: "Bobot bawaan dari kurator" },
@@ -150,6 +166,12 @@ export const id: Dict = {
     onlyIn: "Artikel ini hanya tersedia dalam bahasa Inggris.",
     gamesInPost: "Game di artikel ini", published: "Terbit {date}",
     play: "Putar video: {title}", more: "{type} lainnya",
+    shortsLabel: "Belajar dalam 60 detik",
+    review: {
+      forLabel: "Cocok untuk", skipLabel: "Lewati jika", srcLabel: "Sumber salinan",
+      sources: { bought: "Dibeli sendiri", publisher: "Dikirim penerbit", borrowed: "Pinjaman" },
+      subs: { teach: "Mudah diajarkan", interaction: "Interaksi", replay: "Ingin main lagi" },
+    },
   },
   method: {
     title: "Cara kerja rekomendasi",

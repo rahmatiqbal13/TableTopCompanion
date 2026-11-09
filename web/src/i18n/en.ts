@@ -23,6 +23,10 @@ export const en = {
     noneTitle: "Nothing fits the table yet", noneBody: "Try fewer players or a bit more time.", reset: "Reset the table",
     seeAll: "See all", ctaFind: "Find a game", ctaBrowse: "Browse games",
     scoresheet: "Score sheet", editor: "editor's score",
+    local: {
+      kicker: "Play near you", title: "Find a table and new people to play with.",
+      body: "Board game cafés, city communities and local shops. We point you to them, including games made in Indonesia.",
+    },
     method: {
       kicker: "How it works", title: "Every pick comes with its reasons.",
       body: "Match scores come from hybrid TOPSIS: each game is compared with the ideal game for your settings. Every step is open to inspect.",
@@ -81,6 +85,18 @@ export const en = {
     alike: "Similar:", feedbackQ: "Good suggestion?", feedbackUp: "Good pick", feedbackDown: "Not for me", feedbackThanks: "Thanks for the feedback!",
     showTop: "Show top 15", showAllRows: "Show all {n} rows",
     mixNote: "This table lists every matching game by score, including look-alikes grouped by “Mix it up”.",
+  },
+  local: {
+    title: "Play near you",
+    intro: "Board game cafés, city communities and games made in Indonesia.",
+    types: {
+      cafes: { title: "Board game cafés", sub: "Find one in your city", intro: "Places where you can sit down and play." },
+      communities: { title: "City communities", sub: "Weekly meetups", intro: "Groups that meet to play, and welcome new faces." },
+      games: { title: "Made in Indonesia", sub: "Games by local designers", intro: "Board games designed and published in Indonesia." },
+    },
+    empty: "Nothing listed here yet. Check back soon.", allCities: "All cities", count: "{n} listed",
+    address: "Address", map: "Open in Maps", website: "Website", instagram: "Instagram", contact: "Contact",
+    schedule: "Schedule", designer: "Designer", catalog: "See it in the catalog",
   },
   presets: {
     balanced: { label: "Balanced", description: "The curator's default weights" },
@@ -144,6 +160,12 @@ export const en = {
     onlyIn: "This article is only available in Indonesian.",
     gamesInPost: "Games in this article", published: "Published {date}",
     play: "Play video: {title}", more: "More {type}",
+    shortsLabel: "Learn it in 60 seconds",
+    review: {
+      forLabel: "Great for", skipLabel: "Skip if", srcLabel: "Review copy",
+      sources: { bought: "Bought by us", publisher: "Sent by the publisher", borrowed: "Borrowed" },
+      subs: { teach: "Easy to teach", interaction: "Interaction", replay: "Want to replay" },
+    },
   },
   method: {
     title: "How the recommendations work",

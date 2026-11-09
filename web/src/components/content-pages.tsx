@@ -3,14 +3,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { PageSkeleton } from "@/components/ui";
-import { GameCard, PostCard } from "@/components/cards";
+import { GameCard, PostCard, ReviewVerdict, ShortsRail } from "@/components/cards";
 import { Markdown } from "@/components/markdown";
-import { YouTubeEmbed } from "@/components/youtube-embed";
+import { VideoPlayer } from "@/components/video-player";
 import { fmt, getDict, hasLocale, locales } from "@/i18n";
 import { getCatalog, getPublishedPost, getPublishedPosts } from "@/lib/data";
 import { formatDate } from "@/lib/format";
 import { href, postHref, postText } from "@/lib/i18n-paths";
-import type { PostType } from "@/lib/types";
+import { isPortrait, postThumb, postVideo } from "@/lib/video";
+import { SUBSCORE_KEYS, type PostType } from "@/lib/types";
 
 type ListProps = { params: Promise<{ lang: string }> };
 type DetailProps = { params: Promise<{ lang: string; slug: string }> };
@@ -28,15 +29,17 @@ export function listing(type: PostType) {
     const { lang } = await params;
     if (!hasLocale(lang)) notFound();
     const t = getDict(lang);
-    const posts = (await getPublishedPosts()).filter((p) => p.type === type);
-    const [lead, ...rest] = posts;
+    const all = (await getPublishedPosts()).filter((p) => p.type === type);
+    const shorts = type === "videos" ? all.filter((p) => p.videoFormat === "short") : [];
+    const [lead, ...rest] = all.filter((p) => !shorts.includes(p));
     return (
       <div className="mx-auto max-w-6xl px-4 pb-20 pt-10">
         <h1 className="font-display text-4xl font-semibold tracking-tight">{t.posts.types[type].title}</h1>
         <p className="mt-2 max-w-2xl text-muted">{t.posts.types[type].intro}</p>
-        {!lead ? (
+        {shorts.length > 0 && <div className="mt-8"><ShortsRail posts={shorts} lang={lang} t={t} /></div>}
+        {!lead && !shorts.length ? (
           <p className="mt-10 rounded-2xl border border-dashed border-line p-10 text-center text-muted">{t.posts.empty}</p>
-        ) : (
+        ) : lead && (
           <>
             <div className="mt-8 max-w-3xl"><PostCard post={lead} lang={lang} t={t} size="lg" /></div>
             {rest.length > 0 && (
@@ -65,7 +68,7 @@ export function detail(type: PostType) {
     const post = hasLocale(lang) ? await getPublishedPost(slug) : null;
     if (!post || post.type !== type || !hasLocale(lang)) return {};
     const { text } = postText(post, lang);
-    const image = post.coverUrl ?? (post.youtubeId ? `https://i.ytimg.com/vi/${post.youtubeId}/hqdefault.jpg` : undefined);
+    const image = postThumb(post) ?? undefined;
     return {
       title: text.title,
       description: text.excerpt,
@@ -94,6 +97,8 @@ export function detail(type: PostType) {
     const games = post.gameIds.map((id) => catalog.games.find((g) => g.id === id)).filter((g) => g !== undefined);
     const genres = new Map(catalog.genres.map((g) => [g.id, g]));
     const more = all.filter((p) => p.type === type && p.id !== post.id).slice(0, 3);
+    const video = postVideo(post);
+    const subs = SUBSCORE_KEYS.filter((k) => post.subscores[k] !== undefined);
 
     return (
       <div className="mx-auto max-w-6xl px-4 pb-20 pt-8">
@@ -109,8 +114,8 @@ export function detail(type: PostType) {
           </header>
           {fallback && <p className="mt-6 rounded-xl bg-sunken p-3 text-sm text-muted">{t.posts.onlyIn}</p>}
           <div className="mt-8">
-            {post.youtubeId ? (
-              <YouTubeEmbed id={post.youtubeId} title={text.title} playLabel={fmt(t.posts.play, { title: text.title })} />
+            {video ? (
+              <VideoPlayer video={video} thumb={postThumb(post)} portrait={isPortrait(post)} title={text.title} playLabel={fmt(t.posts.play, { title: text.title })} />
             ) : post.coverUrl ? (
               // eslint-disable-next-line @next/next/no-img-element -- author covers from any host
               <img src={post.coverUrl} alt="" className="w-full rounded-2xl" />
@@ -124,6 +129,18 @@ export function detail(type: PostType) {
               <span className="text-sm text-muted">{t.game.editorScore}<br />/ 10</span>
             </div>
           )}
+          {subs.length > 0 && (
+            <ul className="mt-4 rounded-2xl border border-line bg-card px-5 py-3">
+              {subs.map((k) => (
+                <li key={k} className="flex h-9 items-baseline gap-2.5 text-[15px]">
+                  <span>{t.posts.review.subs[k]}</span>
+                  <span aria-hidden className="flex-1 -translate-y-1 border-b border-dotted border-muted/50" />
+                  <span className="font-mono font-semibold">{post.subscores[k]}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="mt-6"><ReviewVerdict post={post} text={text} textLang={textLang} t={t} /></div>
           <div lang={textLang} className="mt-8">
             <Markdown source={text.body} playLabel={fmt(t.posts.play, { title: text.title })} />
           </div>

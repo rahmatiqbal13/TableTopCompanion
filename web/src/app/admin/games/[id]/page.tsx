@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { AdminSignIn } from "@/components/admin-signin";
 import { GameForm } from "@/components/admin-forms";
@@ -18,6 +19,7 @@ export default function EditGamePage({ params }: PageProps<"/admin/games/[id]">)
 }
 
 async function Editor({ params }: { params: Promise<{ id: string }> }) {
+  await connection(); // always decide at request time, never at build time
   if (!(await isAdmin())) return <AdminSignIn />;
   const { id } = await params;
   const catalog = await getCatalog();

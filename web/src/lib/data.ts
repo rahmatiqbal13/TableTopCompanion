@@ -5,10 +5,11 @@ import seedCatalog from "@/data/seed.json";
 import seedPosts from "@/data/posts.json";
 import { db, hasDatabase } from "./db/client";
 import * as schema from "./db/schema";
-import type { Catalog, Post } from "./types";
+import type { Catalog, LocalListing, Post } from "./types";
 
 export const CATALOG_TAG = "catalog";
 export const POSTS_TAG = "posts";
+export const LOCAL_TAG = "local";
 
 /** The whole catalog (a few thousand rows at most), cached until an admin edit. */
 export async function getCatalog(): Promise<Catalog> {
@@ -80,6 +81,26 @@ export async function getPublishedPost(slug: string): Promise<Post | null> {
 export async function getAllPostsForAdmin(): Promise<Post[]> {
   if (!hasDatabase) return seedPosts as Post[];
   return (await db().select().from(schema.posts).orderBy(desc(schema.posts.updatedAt))).map(toPost);
+}
+
+type ListingRow = typeof schema.localListings.$inferSelect;
+const toListing = (r: ListingRow): LocalListing => ({ ...r, updatedAt: r.updatedAt.toISOString() });
+
+/** Published "Play near you" listings. Empty without a database: this directory has no seed data. */
+export async function getPublishedListings(): Promise<LocalListing[]> {
+  "use cache";
+  cacheTag(LOCAL_TAG);
+  cacheLife("hours"); // safety net; edits normally clear it at once (admin actions, Supabase webhook)
+
+  if (!hasDatabase) return [];
+  const t = schema.localListings;
+  return (await db().select().from(t).where(eq(t.status, "published")).orderBy(asc(t.name))).map(toListing);
+}
+
+/** Every listing including drafts, for the admin. Not cached. */
+export async function getAllListingsForAdmin(): Promise<LocalListing[]> {
+  if (!hasDatabase) return [];
+  return (await db().select().from(schema.localListings).orderBy(desc(schema.localListings.updatedAt))).map(toListing);
 }
 
 export interface FeedbackStats {

@@ -41,7 +41,7 @@ export default async function LangLayout({ children, params }: LayoutProps<"/[la
               <a className="underline hover:text-ink" href="https://boardgamegeek.com" target="_blank" rel="noreferrer">BoardGameGeek</a>
             </span>
             <span>
-              {t.footer.method} · <Link href={href(lang, "/method")} className="underline hover:text-ink">{t.footer.methodLink}</Link>
+              <Link href={href(lang, "/local")} className="underline hover:text-ink">{t.local.title}</Link> · {t.footer.method} · <Link href={href(lang, "/method")} className="underline hover:text-ink">{t.footer.methodLink}</Link>
             </span>
           </div>
         </footer>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { AdminSignIn } from "@/components/admin-signin";
 
@@ -19,6 +20,7 @@ export default function EditPostPage({ params }: PageProps<"/admin/posts/[id]">)
 }
 
 async function Editor({ params }: { params: Promise<{ id: string }> }) {
+  await connection(); // always decide at request time, never at build time
   if (!(await canEdit())) return <AdminSignIn />;
   const { id } = await params;
   const [posts, catalog] = await Promise.all([getAllPostsForAdmin(), getCatalog()]);

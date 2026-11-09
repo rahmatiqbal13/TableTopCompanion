@@ -4,8 +4,9 @@ Next.js 16 app, bilingual (`/id`, `/en`), Postgres on Supabase, deployable to Ve
 
 - **Recommend** `/[lang]/recommend`: constraints, priorities, favourites, shareable URL, “Show the math”
 - **Games** `/[lang]/games` and a hub page per game (stats, your review, videos, related posts, similar games)
-- **Content** `/[lang]/reviews`, `/videos`, `/news`, `/guides`: written by you in the admin, Markdown, YouTube embeds
-- **Admin** `/admin`: posts, games, criteria, genres
+- **Content** `/[lang]/reviews`, `/videos`, `/news`, `/guides`: written by you in the admin, Markdown, YouTube and TikTok embeds
+- **Play near you** `/[lang]/local`: cafés, communities and Indonesian-made games, managed in `/admin/local`
+- **Admin** `/admin`: posts, near-you listings, games, criteria, genres
 - `sitemap.xml` with language alternates, `robots.txt`
 
 Visitors are sent to their language by a saved choice, then their browser language, then Indonesian.
@@ -95,8 +96,16 @@ Without webhooks, press **↻ Refresh site data** in `/admin` after editing (or 
 
 `/admin/posts` → **New post**. Each post has a type (news, review, video, guide), a status (draft/published),
 text in Bahasa Indonesia and/or English (a missing language falls back to the other with a note),
-an optional YouTube link (required for videos), an editor's score for reviews, and linked games, which makes
-the post appear on those games' pages. A YouTube link on its own line in the body becomes an embedded player.
+an optional YouTube or TikTok link (required for videos), and linked games, which makes the post appear on those
+games' pages. A video link on its own line in the body becomes an embedded player.
+
+- **Videos** are Long or Short. Shorts go in the "60 seconds" rail. TikToks and YouTube Shorts links preselect Short.
+  Duration is typed by hand (`6:12`). TikTok has no stable public thumbnail, so give TikTok posts a cover image.
+- **Reviews** also take a score, sub-scores (easy to teach, interaction, replay), how the copy was obtained, and
+  "Great for" / "Skip if" per language. Without sub-scores the score sheet shows the game's own numbers.
+
+`/admin/local` → **New listing** adds a café, community or Indonesian-made game to "Play near you". The home page
+only shows that section once something is published.
 
 ## More game data (BoardGameGeek)
 

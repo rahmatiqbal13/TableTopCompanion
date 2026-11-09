@@ -21,6 +21,11 @@
     "body": "TableTop Companion helps you pick the right board game for tonight, then keeps you company with reviews, videos and news.\n\n## Using the recommender\n\n1. Open **Recommend** and set tonight's table: group size, youngest player and the time you have.\n2. Set **what matters**. Slide the weight of each criterion, or start from a preset like *Family night*.\n3. Add **games you love** so the picks lean toward your taste.\n4. Share the link with friends. Every setting lives in the URL.\n\n## Why a \"match\" score?\n\nScores come from **hybrid TOPSIS**: each game is compared with the ideal game for your settings. Open *Show the math* to see every step.\n\n> Sponsored content never changes recommendation scores.\n"
    }
   },
-  "updatedAt": "2026-11-06T00:00:00.000Z"
+  "updatedAt": "2026-11-06T00:00:00.000Z",
+  "tiktokId": null,
+  "videoFormat": "long",
+  "durationSec": null,
+  "reviewSource": null,
+  "subscores": {}
  }
 ]

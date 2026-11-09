@@ -6,9 +6,10 @@ import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { endSession, passwordMatches, requireAdmin, requireEditor, startSession } from "@/lib/auth";
-import { CATALOG_TAG, POSTS_TAG } from "@/lib/data";
+import { CATALOG_TAG, LOCAL_TAG, POSTS_TAG } from "@/lib/data";
 import { slugify } from "@/lib/format";
-import { parseYouTubeId } from "@/lib/youtube";
+import { isTikTokShortLink, isTikTokUrl, parseDuration, parseTikTokId, parseVideoLink, type VideoRef } from "@/lib/video";
+import { LOCAL_KINDS, REVIEW_SOURCES, SUBSCORE_KEYS, VIDEO_FORMATS, type LocalListing, type SubScores } from "@/lib/types";
 import { db, hasDatabase } from "@/lib/db/client";
 import * as schema from "@/lib/db/schema";
 
@@ -197,8 +198,12 @@ const postSchema = z.object({
   slug: z.string().trim().max(120),
   publishedAt: z.string().trim(),
   coverUrl: optionalUrl,
-  youtube: z.string().trim().max(200),
-  score: z.preprocess((v) => (v === "" ? null : v), z.coerce.number().min(0).max(10).nullable()),
+  video: z.string().trim().max(300),
+  videoFormat: z.enum(VIDEO_FORMATS).default("long"),
+  duration: z.string().trim().max(10).default(""),
+  // Review-only fields aren't in the form for other post types.
+  score: z.preprocess((v) => (v === "" || v === undefined ? null : v), z.coerce.number().min(0).max(10).nullable()),
+  reviewSource: z.preprocess((v) => (v === "" || v === undefined ? null : v), z.enum(REVIEW_SOURCES).nullable()),
   gameIds: z.string().transform((s) => s.split(",").map(Number).filter((n) => Number.isInteger(n) && n > 0)),
 });
 
@@ -209,8 +214,30 @@ const langText = (form: FormData, lang: "id" | "en") => {
     title,
     excerpt: String(form.get(`excerpt_${lang}`) ?? "").trim().slice(0, 400),
     body: String(form.get(`body_${lang}`) ?? "").slice(0, 100_000),
+    forWho: String(form.get(`forWho_${lang}`) ?? "").trim().slice(0, 200) || undefined,
+    skip: String(form.get(`skip_${lang}`) ?? "").trim().slice(0, 200) || undefined,
   };
 };
+
+/** Reads a video link, following TikTok share links (only ever within tiktok.com) to find the id. */
+async function resolveVideo(link: string): Promise<VideoRef | null> {
+  const direct = parseVideoLink(link);
+  if (direct || !isTikTokShortLink(link)) return direct;
+  try {
+    let next = link;
+    for (let hop = 0; hop < 3; hop++) {
+      const res = await fetch(next, { redirect: "manual", signal: AbortSignal.timeout(5000) });
+      const target = res.headers.get("location");
+      if (!target) return null;
+      const url = new URL(target, next);
+      if (!isTikTokUrl(url)) return null;
+      const id = parseTikTokId(url.href);
+      if (id) return { platform: "tiktok", id };
+      next = url.href;
+    }
+  } catch { /* unreachable or malformed: reported as an invalid link */ }
+  return null;
+}
 
 export async function savePost(_: FormState, form: FormData): Promise<FormState> {
   const blocked = await writeBlocked("editor");
@@ -222,9 +249,26 @@ export async function savePost(_: FormState, form: FormData): Promise<FormState>
   const text = { id: langText(form, "id"), en: langText(form, "en") };
   if (!text.id && !text.en) return { error: "Write a title in at least one language." };
 
-  const youtubeId = d.youtube ? parseYouTubeId(d.youtube) : null;
-  if (d.youtube && !youtubeId) return { error: "That doesn't look like a YouTube link." };
-  if (d.type === "videos" && !youtubeId) return { error: "Video posts need a YouTube link." };
+  const video = d.video ? await resolveVideo(d.video) : null;
+  if (d.video && !video) {
+    return { error: isTikTokShortLink(d.video)
+      ? "Couldn't read that TikTok share link. Open it in a browser and paste the full tiktok.com/@user/video/… address."
+      : "That doesn't look like a YouTube or TikTok link." };
+  }
+  if (d.type === "videos" && !video) return { error: "Video posts need a YouTube or TikTok link." };
+  const durationSec = d.duration && video ? parseDuration(d.duration) : null;
+  if (d.duration && video && durationSec === null) return { error: "Write the duration like 6:12." };
+
+  const subscores: SubScores = {};
+  if (d.type === "reviews") {
+    for (const key of SUBSCORE_KEYS) {
+      const raw = String(form.get(`sub_${key}`) ?? "").trim();
+      if (!raw) continue;
+      const value = Number(raw);
+      if (!Number.isFinite(value) || value < 0 || value > 10) return { error: "Sub-scores must be between 0 and 10." };
+      subscores[key] = value;
+    }
+  }
 
   const slug = slugify(d.slug || (text.id ?? text.en)!.title);
   if (!slug) return { error: "Slug is empty." };
@@ -232,8 +276,12 @@ export async function savePost(_: FormState, form: FormData): Promise<FormState>
   if (publishedAt && Number.isNaN(publishedAt.getTime())) return { error: "Invalid publish date." };
 
   const row = {
-    type: d.type, status: d.status, slug, publishedAt, coverUrl: d.coverUrl, youtubeId,
-    score: d.type === "reviews" ? d.score : null, gameIds: d.gameIds,
+    type: d.type, status: d.status, slug, publishedAt, coverUrl: d.coverUrl,
+    youtubeId: video?.platform === "youtube" ? video.id : null,
+    tiktokId: video?.platform === "tiktok" ? video.id : null,
+    videoFormat: video ? d.videoFormat : ("long" as const), durationSec,
+    score: d.type === "reviews" ? d.score : null,
+    reviewSource: d.type === "reviews" ? d.reviewSource : null, subscores, gameIds: d.gameIds,
     text: Object.fromEntries(Object.entries(text).filter(([, v]) => v)), updatedAt: sql`now()`,
   };
   const id = Number(form.get("id"));
@@ -253,6 +301,68 @@ export async function deletePost(form: FormData) {
   updateTag(POSTS_TAG);
 }
 
+
+// ---------------------------------------------------------------------------
+// "Play near you" directory
+// ---------------------------------------------------------------------------
+
+const blankToNull = (max: number) => z.string().trim().max(max).default("").transform((s) => s || null);
+
+const listingSchema = z.object({
+  kind: z.enum(LOCAL_KINDS),
+  status: z.enum(["draft", "published"]),
+  name: z.string().trim().min(1, "Name is required").max(160),
+  slug: z.string().trim().max(120),
+  city: z.string().trim().max(80),
+  address: blankToNull(300),
+  contact: blankToNull(120),
+  designer: blankToNull(120),
+  gameId: z.preprocess((v) => (v === "" || v === undefined ? null : v), z.coerce.number().int().positive().nullable()),
+  mapUrl: optionalUrl,
+  websiteUrl: optionalUrl,
+  instagramUrl: optionalUrl,
+  imageUrl: optionalUrl,
+});
+
+const listingLangText = (form: FormData, lang: "id" | "en") => {
+  const summary = String(form.get(`summary_${lang}`) ?? "").trim().slice(0, 300);
+  const schedule = String(form.get(`schedule_${lang}`) ?? "").trim().slice(0, 200);
+  const body = String(form.get(`body_${lang}`) ?? "").slice(0, 20_000);
+  return summary || schedule || body.trim() ? { summary, schedule, body } : undefined;
+};
+
+export async function saveListing(_: FormState, form: FormData): Promise<FormState> {
+  const blocked = await writeBlocked("editor");
+  if (blocked) return { error: blocked };
+  const parsed = listingSchema.safeParse(Object.fromEntries(form));
+  if (!parsed.success) return { error: parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ") };
+  const { slug: rawSlug, ...d } = parsed.data;
+  const slug = slugify(rawSlug || d.name);
+  if (!slug) return { error: "Slug is empty." };
+
+  const text: LocalListing["text"] = { id: listingLangText(form, "id"), en: listingLangText(form, "en") };
+  const row = {
+    ...d, slug,
+    // These two only apply to Indonesian-made games.
+    designer: d.kind === "games" ? d.designer : null, gameId: d.kind === "games" ? d.gameId : null,
+    text: Object.fromEntries(Object.entries(text).filter(([, v]) => v)), updatedAt: sql`now()`,
+  };
+  const id = Number(form.get("id"));
+  try {
+    if (id) await db().update(schema.localListings).set(row).where(eq(schema.localListings.id, id));
+    else await db().insert(schema.localListings).values(row);
+  } catch (e) {
+    return { error: e instanceof Error && /unique/i.test(e.message) ? `The slug "${slug}" is already used.` : "Could not save the listing." };
+  }
+  updateTag(LOCAL_TAG);
+  redirect("/admin/local?saved=1");
+}
+
+export async function deleteListing(form: FormData) {
+  await guard("editor");
+  await db().delete(schema.localListings).where(eq(schema.localListings.id, Number(form.get("id"))));
+  updateTag(LOCAL_TAG);
+}
 
 const MAX_UPLOAD = 4 * 1024 * 1024;
 
@@ -305,4 +415,5 @@ export async function refreshSiteData() {
   await requireEditor();
   updateTag(CATALOG_TAG);
   updateTag(POSTS_TAG);
+  updateTag(LOCAL_TAG);
 }

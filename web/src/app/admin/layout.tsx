@@ -11,6 +11,7 @@ export default function AdminLayout({ children }: LayoutProps<"/admin">) {
     { href: "/admin", label: "Dashboard" },
     { href: "/admin/catalog", label: "Catalog" },
     { href: "/admin/posts", label: "Posts" },
+    { href: "/admin/local", label: "Near you" },
     { href: "/admin/feedback", label: "Feedback" },
     { href: "/admin/users", label: "Users" },
   ];

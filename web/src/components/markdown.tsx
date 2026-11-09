@@ -1,19 +1,19 @@
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { parseYouTubeId } from "@/lib/youtube";
-import { YouTubeEmbed } from "./youtube-embed";
+import { parseVideoLink, videoThumb } from "@/lib/video";
+import { VideoPlayer } from "./video-player";
 
 /**
  * Renders post Markdown. Raw HTML is not allowed (react-markdown escapes it),
- * and a paragraph that is only a YouTube link becomes an embedded player.
+ * and a paragraph that is only a YouTube or TikTok link becomes an embedded player.
  */
 export function Markdown({ source, playLabel }: { source: string; playLabel: string }) {
   const components: Components = {
     p({ node, children }) {
       const only = node?.children.length === 1 ? node.children[0] : null;
       if (only?.type === "element" && only.tagName === "a") {
-        const id = parseYouTubeId(String(only.properties?.href ?? ""));
-        if (id) return <div className="my-6"><YouTubeEmbed id={id} title="YouTube video" playLabel={playLabel} /></div>;
+        const video = parseVideoLink(String(only.properties?.href ?? ""));
+        if (video) return <div className="my-6"><VideoPlayer video={video} thumb={videoThumb(video)} portrait={video.platform === "tiktok"} title="Video" playLabel={playLabel} /></div>;
       }
       return <p>{children}</p>;
     },

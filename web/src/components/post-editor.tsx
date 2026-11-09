@@ -3,8 +3,8 @@
 import { useActionState, useMemo, useState, useTransition } from "react";
 import { savePost, uploadImage, type FormState } from "@/app/admin/actions";
 import { slugify } from "@/lib/format";
-import { parseYouTubeId } from "@/lib/youtube";
-import type { Game, Post, PostType } from "@/lib/types";
+import { formatDuration, isTikTokShortLink, parseVideoLink, postVideo, videoLink } from "@/lib/video";
+import { REVIEW_SOURCES, SUBSCORE_KEYS, type Game, type Post, type PostType, type VideoFormat } from "@/lib/types";
 import { Markdown } from "./markdown";
 
 const input = "w-full rounded-lg border border-line bg-paper px-3 py-1.5 text-sm";
@@ -13,6 +13,8 @@ const TYPES: { value: PostType; label: string }[] = [
   { value: "news", label: "News" }, { value: "reviews", label: "Review" },
   { value: "videos", label: "Video" }, { value: "guides", label: "Guide" },
 ];
+const SUB_LABELS = { teach: "Easy to teach", interaction: "Interaction", replay: "Want to replay" };
+const SOURCE_LABELS = { bought: "Bought by us", publisher: "Sent by the publisher", borrowed: "Borrowed" };
 
 export function PostEditor({ post, games, canUpload }: { post: Post | null; games: Pick<Game, "id" | "name" | "year">[]; canUpload: boolean }) {
   const [state, action, pending] = useActionState<FormState, FormData>(savePost, {});
@@ -24,20 +26,29 @@ export function PostEditor({ post, games, canUpload }: { post: Post | null; game
     en: post?.text.en ?? { title: "", excerpt: "", body: "" },
   });
   const [slug, setSlug] = useState(post?.slug ?? "");
-  const [youtube, setYoutube] = useState(post?.youtubeId ? `https://youtu.be/${post.youtubeId}` : "");
+  const existingVideo = post ? postVideo(post) : null;
+  const [link, setLink] = useState(existingVideo ? videoLink(existingVideo) : "");
+  const [format, setFormat] = useState<VideoFormat>(post?.videoFormat ?? "long");
   const [cover, setCover] = useState(post?.coverUrl ?? "");
   const [gameIds, setGameIds] = useState<number[]>(post?.gameIds ?? []);
-  const ytId = parseYouTubeId(youtube);
+  const video = parseVideoLink(link);
+  const shortLink = isTikTokShortLink(link);
   const autoSlug = slugify(text.id.title || text.en.title);
 
-  const setField = (field: "title" | "excerpt" | "body", value: string) =>
+  const changeLink = (value: string) => {
+    setLink(value);
+    // TikToks and YouTube Shorts are vertical; the editor can still change this.
+    if (/\/shorts\/|tiktok\.com/i.test(value)) setFormat("short");
+  };
+
+  const setField = (field: "title" | "excerpt" | "body" | "forWho" | "skip", value: string) =>
     setText((s) => ({ ...s, [tab]: { ...s[tab], [field]: value } }));
 
   return (
     <form action={action} className="space-y-6">
       <input type="hidden" name="id" value={post?.id ?? ""} />
-      {LANGS.flatMap(({ code }) => (["title", "excerpt", "body"] as const).map((f) => (
-        <input key={`${code}-${f}`} type="hidden" name={`${f}_${code}`} value={text[code][f]} />
+      {LANGS.flatMap(({ code }) => (["title", "excerpt", "body", "forWho", "skip"] as const).map((f) => (
+        <input key={`${code}-${f}`} type="hidden" name={`${f}_${code}`} value={text[code][f] ?? ""} />
       )))}
 
       <div className="grid gap-4 rounded-2xl border border-line bg-card p-5 sm:grid-cols-4">
@@ -80,10 +91,20 @@ export function PostEditor({ post, games, canUpload }: { post: Post | null; game
           <label className="block text-sm font-medium">Excerpt <span className="font-normal text-muted">(shown on cards and in search results)</span>
             <textarea value={text[tab].excerpt} onChange={(e) => setField("excerpt", e.target.value)} rows={2} maxLength={400} className={`${input} mt-1`} />
           </label>
+          {type === "reviews" && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block text-sm font-medium">Great for
+                <input value={text[tab].forWho ?? ""} onChange={(e) => setField("forWho", e.target.value)} maxLength={200} className={`${input} mt-1`} />
+              </label>
+              <label className="block text-sm font-medium">Skip if
+                <input value={text[tab].skip ?? ""} onChange={(e) => setField("skip", e.target.value)} maxLength={200} className={`${input} mt-1`} />
+              </label>
+            </div>
+          )}
           {preview ? (
             <div className="rounded-xl border border-line p-5"><Markdown source={text[tab].body} playLabel="Play" /></div>
           ) : (
-            <label className="block text-sm font-medium">Body <span className="font-normal text-muted">(Markdown: ## heading, **bold**, [link](url), a YouTube link on its own line becomes a player)</span>
+            <label className="block text-sm font-medium">Body <span className="font-normal text-muted">(Markdown: ## heading, **bold**, [link](url), a YouTube or TikTok link on its own line becomes a player)</span>
               <textarea value={text[tab].body} onChange={(e) => setField("body", e.target.value)} rows={18} className={`${input} mt-1 font-mono`} />
             </label>
           )}
@@ -91,17 +112,49 @@ export function PostEditor({ post, games, canUpload }: { post: Post | null; game
       </div>
 
       <div className="grid gap-4 rounded-2xl border border-line bg-card p-5 sm:grid-cols-2">
-        <label className="text-sm font-medium">YouTube link {type === "videos" && <span className="text-meeple">(required)</span>}
-          <input name="youtube" value={youtube} onChange={(e) => setYoutube(e.target.value)} placeholder="https://youtu.be/…" className={`${input} mt-1`} />
-          {youtube && <span className={`mt-1 block text-xs ${ytId ? "text-felt" : "text-meeple"}`}>{ytId ? `✓ video ${ytId}` : "Not a YouTube link"}</span>}
+        <label className="text-sm font-medium sm:col-span-2">Video link <span className="font-normal text-muted">(YouTube or TikTok)</span> {type === "videos" && <span className="text-meeple">(required)</span>}
+          <input name="video" value={link} onChange={(e) => changeLink(e.target.value)} placeholder="https://youtu.be/… or https://www.tiktok.com/@user/video/…" className={`${input} mt-1`} />
+          {link && (
+            <span className={`mt-1 block text-xs ${video || shortLink ? "text-felt" : "text-meeple"}`}>
+              {video ? `✓ ${video.platform === "youtube" ? "YouTube" : "TikTok"} video ${video.id}` : shortLink ? "✓ TikTok share link, resolved when you save" : "Not a YouTube or TikTok link"}
+            </span>
+          )}
         </label>
+        {(video || shortLink) && (
+          <>
+            <label className="text-sm font-medium">Format
+              <select name="videoFormat" value={format} onChange={(e) => setFormat(e.target.value as VideoFormat)} className={`${input} mt-1`}>
+                <option value="long">Long video</option>
+                <option value="short">Short (vertical, in the 60-second rail)</option>
+              </select>
+            </label>
+            <label className="text-sm font-medium">Duration <span className="font-normal text-muted">(optional, e.g. 6:12)</span>
+              <input name="duration" defaultValue={post?.durationSec != null ? formatDuration(post.durationSec) : ""} placeholder="6:12" className={`${input} mt-1`} />
+            </label>
+          </>
+        )}
         {type === "reviews" && (
-          <label className="text-sm font-medium">Editor&apos;s score <span className="font-normal text-muted">(0–10)</span>
-            <input name="score" type="number" min={0} max={10} step={0.5} defaultValue={post?.score ?? ""} className={`${input} mt-1`} />
-          </label>
+          <>
+            <label className="text-sm font-medium">Editor&apos;s score <span className="font-normal text-muted">(0–10)</span>
+              <input name="score" type="number" min={0} max={10} step={0.5} defaultValue={post?.score ?? ""} className={`${input} mt-1`} />
+            </label>
+            <label className="text-sm font-medium">Review copy
+              <select name="reviewSource" defaultValue={post?.reviewSource ?? ""} className={`${input} mt-1`}>
+                <option value="">Not stated</option>
+                {REVIEW_SOURCES.map((s) => <option key={s} value={s}>{SOURCE_LABELS[s]}</option>)}
+              </select>
+            </label>
+            <div className="grid grid-cols-3 gap-3 sm:col-span-2">
+              {SUBSCORE_KEYS.map((k) => (
+                <label key={k} className="text-sm font-medium">{SUB_LABELS[k]} <span className="font-normal text-muted">(0–10)</span>
+                  <input name={`sub_${k}`} type="number" min={0} max={10} step={0.5} defaultValue={post?.subscores[k] ?? ""} className={`${input} mt-1`} />
+                </label>
+              ))}
+            </div>
+          </>
         )}
         <div className="sm:col-span-2">
-          <label className="text-sm font-medium">Cover image URL <span className="font-normal text-muted">(optional; videos use the YouTube thumbnail)</span>
+          <label className="text-sm font-medium">Cover image URL <span className="font-normal text-muted">(optional; YouTube videos use their thumbnail, TikTok videos need one here)</span>
             <input name="coverUrl" type="url" value={cover} onChange={(e) => setCover(e.target.value)} className={`${input} mt-1`} />
           </label>
           <ImageUpload enabled={canUpload} onUploaded={(url) => setCover((c) => c || url)} />
@@ -121,7 +174,7 @@ export function PostEditor({ post, games, canUpload }: { post: Post | null; game
   );
 }
 
-function ImageUpload({ enabled, onUploaded }: { enabled: boolean; onUploaded: (url: string) => void }) {
+export function ImageUpload({ enabled, onUploaded }: { enabled: boolean; onUploaded: (url: string) => void }) {
   const [pending, start] = useTransition();
   const [result, setResult] = useState<{ url?: string; error?: string }>({});
   if (!enabled) {
