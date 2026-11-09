@@ -32,17 +32,17 @@ export function AuthMenu({ lang, labels: l }: { lang: Locale; labels: AuthMenuLa
   }, [sb]);
 
   if (!sb) return null;
-  if (account === undefined) return <span className="h-8 w-16 animate-pulse rounded-md bg-sunken" aria-hidden />;
+  if (account === undefined) return <span className="h-8 w-16 animate-pulse rounded-full bg-on-table/15" aria-hidden />;
   if (!account) {
     return (
       <Link href={`${href(lang, "/login")}?next=${encodeURIComponent(path)}`}
-        className="rounded-md bg-felt px-3 py-1.5 text-xs font-medium text-on-felt hover:opacity-90">
+        className="rounded-full bg-on-table px-3 py-2 text-xs font-medium text-table-ink hover:opacity-90">
         {l.signIn}
       </Link>
     );
   }
   const initial = (account.name ?? account.email ?? "?").trim().charAt(0).toUpperCase();
-  const quick = "hidden rounded-md px-2.5 py-1.5 text-xs font-medium text-muted hover:bg-sunken hover:text-ink sm:block";
+  const quick = "hidden rounded-full px-2.5 py-1.5 text-xs font-medium text-on-table-muted hover:bg-on-table/10 hover:text-on-table sm:block";
   return (
     <>
     <Link href={href(lang, "/me")} className={quick}>{l.myGames}</Link>
@@ -52,15 +52,15 @@ export function AuthMenu({ lang, labels: l }: { lang: Locale; labels: AuthMenuLa
       <a href="/admin" className={quick}>{l.admin}</a>
     )}
     <details className="relative">
-      <summary className="flex cursor-pointer list-none items-center gap-2 rounded-md px-1 py-1 hover:bg-sunken" aria-label={l.account}>
+      <summary className="flex cursor-pointer list-none items-center gap-2 rounded-full px-1 py-1 hover:bg-on-table/10" aria-label={l.account}>
         {account.avatar ? (
           // eslint-disable-next-line @next/next/no-img-element -- Google profile photo
           <img src={account.avatar} alt="" width={28} height={28} referrerPolicy="no-referrer" className="size-7 rounded-full" />
         ) : (
-          <span className="grid size-7 place-items-center rounded-full bg-felt text-xs font-semibold text-on-felt">{initial}</span>
+          <span className="grid size-7 place-items-center rounded-full bg-on-table text-xs font-semibold text-table-ink">{initial}</span>
         )}
       </summary>
-      <div className="absolute right-0 z-20 mt-2 w-56 rounded-xl border border-line bg-card p-1.5 text-sm shadow-lg">
+      <div className="absolute right-0 z-20 mt-2 w-56 rounded-xl border border-line bg-card p-1.5 text-sm text-ink shadow-lg">
         <p className="truncate px-3 py-2 text-xs text-muted">{account.email ?? account.name}</p>
         <Link href={href(lang, "/me")} className="block rounded-lg px-3 py-2 hover:bg-sunken">{l.myGames}</Link>
         {account.role !== "user" && (

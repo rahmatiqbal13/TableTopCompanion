@@ -5,8 +5,8 @@ export const id: Dict = {
   intl: "id-ID",
   nav: {
     home: "Beranda", recommend: "Rekomendasi", games: "Game", reviews: "Ulasan", videos: "Video",
-    news: "Berita", guides: "Panduan", method: "Cara kerja", admin: "Admin",
-    switchLabel: "English", switchShort: "EN", menu: "Bagian",
+    news: "Berita", guides: "Panduan", method: "Cara kerja", admin: "Admin", find: "Cari",
+    switchLabel: "Switch to English", menu: "Bagian",
   },
   footer: { data: "Data game dari", method: "Rekomendasi dengan TOPSIS hibrida", methodLink: "lihat metodenya" },
   meta: {
@@ -14,16 +14,24 @@ export const id: Dict = {
     description: "Temukan board game yang pas untuk malam ini, plus ulasan, video, dan berita untuk pemain Indonesia.",
   },
   home: {
-    kicker: "Teman main board game",
+    kicker: "Meja malam ini",
     title: "Malam ini main apa?",
-    subtitle: "Ceritakan siapa yang ikut main dan apa yang penting. {n} game dinilai dengan TOPSIS hibrida, dan setiap rekomendasi ada alasannya.",
-    ctaFind: "Cari game", ctaBrowse: "Lihat semua game",
-    quickTitle: "Pilihan cepat",
-    quick: {
-      party: "Pesta 6 orang", family: "Keluarga dengan anak", duo: "Berdua saja", short: "Di bawah 30 menit", heavy: "Malam strategi berat",
+    subtitle: "Atur siapa yang ikut dan berapa lama waktunya. Kami bagikan tiga game yang paling pas, lengkap dengan alasannya.",
+    fitLabel: "game muat di mejamu",
+    players: "Pemain", playersCount: "{n} pemain", time: "Waktu yang ada", youngest: "Pemain termuda", mood: "Suasana",
+    any: "Bebas", adult: "dewasa",
+    moods: { beginner: "Pemula", quick: "Ringan", family: "Keluarga", brainburner: "Bikin mikir", toprated: "Favorit" },
+    dealt: "Kartu yang dibagikan", allResults: "Lihat semua hasil & perhitungan", pick: "PILIHAN #{n}", match: "cocok",
+    noneTitle: "Belum ada game yang muat", noneBody: "Coba kurangi pemain atau tambah waktunya.", reset: "Atur ulang meja",
+    seeAll: "Lihat semua", ctaFind: "Cari game", ctaBrowse: "Lihat semua game",
+    scoresheet: "Lembar skor", editor: "skor editor",
+    method: {
+      kicker: "Cara kerja", title: "Setiap rekomendasi ada alasannya.",
+      body: "Skor cocok dihitung dengan TOPSIS hibrida: tiap game dibandingkan dengan game ideal untuk pengaturanmu. Semua langkahnya bisa kamu buka.",
+      cta: "Lihat metodenya", formula: "Kedekatan ke solusi ideal",
+      dPlus: "jarak ke game ideal", dMinus: "jarak ke game terburuk",
+      ads: "Konten bersponsor tidak pernah mengubah skor rekomendasi.",
     },
-    latestReviews: "Ulasan terbaru", latestVideos: "Video", latestNews: "Berita", guides: "Panduan",
-    seeAll: "Lihat semua", topRated: "Rating tertinggi di katalog",
   },
   rec: {
     title: "Cari game",
@@ -78,6 +86,7 @@ export const id: Dict = {
   },
   presets: {
     balanced: { label: "Seimbang", description: "Bobot bawaan dari kurator" },
+    beginner: { label: "Pemula", description: "Aturan sederhana dulu, cepat selesai" },
     quick: { label: "Cepat & ringan", description: "Singkat, mudah diajarkan, tetap bagus" },
     family: { label: "Malam keluarga", description: "Ramah anak dan mudah dipelajari" },
     brainburner: { label: "Bikin mikir", description: "Strategi dalam untuk pemain berpengalaman" },

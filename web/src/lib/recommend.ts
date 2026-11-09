@@ -86,6 +86,16 @@ function tuned(overrides: Record<string, CriterionPref>): Preset["criteria"] {
 export const PRESETS: Preset[] = [
   { id: "balanced", label: "Balanced", description: "The curator's default weights", criteria: adminDefaults },
   {
+    id: "beginner", label: "Beginner", description: "Simple rules first, quick to finish",
+    criteria: tuned({
+      complexity: { importance: 9, type: "cost" },
+      playTime: { importance: 5, type: "cost" },
+      rating: { importance: 3, type: "benefit" },
+      minPlayers: { importance: 1, type: "cost" },
+      minAge: { importance: 1, type: "cost" },
+    }),
+  },
+  {
     id: "quick", label: "Quick & light", description: "Short, easy to teach, still well rated",
     criteria: tuned({
       playTime: { importance: 8, type: "cost" },

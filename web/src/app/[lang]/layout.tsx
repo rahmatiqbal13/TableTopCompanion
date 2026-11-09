@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { MobileTabs } from "@/components/mobile-tabs";
 import { SiteHeader } from "@/components/site-header";
 import { getDict, hasLocale, locales } from "@/i18n";
 import { href } from "@/lib/i18n-paths";
@@ -32,8 +33,9 @@ export default async function LangLayout({ children, params }: LayoutProps<"/[la
       <body className="flex min-h-full flex-col">
         <SiteHeader lang={lang} t={t} />
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-line text-xs text-muted">
-          <div className="mx-auto flex max-w-6xl flex-wrap justify-between gap-2 px-4 py-4">
+        <footer className="border-t border-line pb-24 text-sm text-muted min-[721px]:pb-0">
+          <div className="mx-auto flex max-w-6xl flex-wrap justify-between gap-x-8 gap-y-3 px-4 pb-10 pt-7">
+            <span className="font-display font-bold text-ink">TableTop Companion</span>
             <span>
               {t.footer.data}{" "}
               <a className="underline hover:text-ink" href="https://boardgamegeek.com" target="_blank" rel="noreferrer">BoardGameGeek</a>
@@ -43,6 +45,7 @@ export default async function LangLayout({ children, params }: LayoutProps<"/[la
             </span>
           </div>
         </footer>
+        <MobileTabs lang={lang} label={t.nav.menu} labels={{ find: t.nav.find, reviews: t.nav.reviews, videos: t.nav.videos, news: t.nav.news }} />
       </body>
     </html>
   );

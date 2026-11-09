@@ -3,8 +3,8 @@ export const en = {
   intl: "en-GB",
   nav: {
     home: "Home", recommend: "Recommend", games: "Games", reviews: "Reviews", videos: "Videos",
-    news: "News", guides: "Guides", method: "How it works", admin: "Admin",
-    switchLabel: "Bahasa Indonesia", switchShort: "ID", menu: "Sections",
+    news: "News", guides: "Guides", method: "How it works", admin: "Admin", find: "Find",
+    switchLabel: "Ganti ke Bahasa Indonesia", menu: "Sections",
   },
   footer: { data: "Game data from", method: "Recommendations by hybrid TOPSIS", methodLink: "see the method" },
   meta: {
@@ -12,16 +12,24 @@ export const en = {
     description: "Find the right board game for tonight's table, plus reviews, videos and news for Indonesian players.",
   },
   home: {
-    kicker: "Board game companion",
-    title: "What should we play tonight?",
-    subtitle: "Tell us who's at the table and what matters. {n} games are scored with hybrid TOPSIS, and every pick explains itself.",
-    ctaFind: "Find a game", ctaBrowse: "Browse games",
-    quickTitle: "Quick picks",
-    quick: {
-      party: "Party for 6", family: "Family with kids", duo: "Date night for 2", short: "Under 30 minutes", heavy: "Big strategy night",
+    kicker: "Tonight's table",
+    title: "What are we playing tonight?",
+    subtitle: "Tell us who's playing and how long you have. We deal the three best-fitting games, each with its reasons.",
+    fitLabel: "games fit your table",
+    players: "Players", playersCount: "{n} players", time: "Time you have", youngest: "Youngest player", mood: "Mood",
+    any: "Any", adult: "adult",
+    moods: { beginner: "Beginner", quick: "Light", family: "Family", brainburner: "Brain burner", toprated: "Crowd favourite" },
+    dealt: "Your hand", allResults: "See all results & the math", pick: "PICK #{n}", match: "match",
+    noneTitle: "Nothing fits the table yet", noneBody: "Try fewer players or a bit more time.", reset: "Reset the table",
+    seeAll: "See all", ctaFind: "Find a game", ctaBrowse: "Browse games",
+    scoresheet: "Score sheet", editor: "editor's score",
+    method: {
+      kicker: "How it works", title: "Every pick comes with its reasons.",
+      body: "Match scores come from hybrid TOPSIS: each game is compared with the ideal game for your settings. Every step is open to inspect.",
+      cta: "See the method", formula: "Closeness to the ideal solution",
+      dPlus: "distance to the ideal game", dMinus: "distance to the worst game",
+      ads: "Sponsored content never changes recommendation scores.",
     },
-    latestReviews: "Latest reviews", latestVideos: "Videos", latestNews: "News", guides: "Guides",
-    seeAll: "See all", topRated: "Top rated in the catalog",
   },
   rec: {
     title: "Find a game",
@@ -76,6 +84,7 @@ export const en = {
   },
   presets: {
     balanced: { label: "Balanced", description: "The curator's default weights" },
+    beginner: { label: "Beginner", description: "Simple rules first, quick to finish" },
     quick: { label: "Quick & light", description: "Short, easy to teach, still well rated" },
     family: { label: "Family night", description: "Kid-friendly and easy to learn" },
     brainburner: { label: "Brain burner", description: "Deep strategy for experienced players" },
