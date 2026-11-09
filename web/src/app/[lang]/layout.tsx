@@ -40,7 +40,6 @@ export default async function LangLayout({ children, params }: LayoutProps<"/[la
             </span>
             <span>
               {t.footer.method} · <Link href={href(lang, "/method")} className="underline hover:text-ink">{t.footer.methodLink}</Link>
-              {" · "}<Link href="/admin" className="hover:text-ink">{t.nav.admin}</Link>
             </span>
           </div>
         </footer>

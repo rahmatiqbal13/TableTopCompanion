@@ -1,4 +1,4 @@
-import { index, integer, uniqueIndex, jsonb, pgTable, real, serial, smallint, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { boolean, index, integer, primaryKey, uniqueIndex, uuid, jsonb, pgTable, real, serial, smallint, text, timestamp, varchar } from "drizzle-orm/pg-core";
 import type { Post } from "../types";
 
 export const genres = pgTable("genres", {
@@ -75,4 +75,33 @@ export const feedback = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex("feedback_session_game_idx").on(t.sessionId, t.gameId), index("feedback_created_idx").on(t.createdAt)],
+);
+
+/**
+ * One row per Supabase Auth user (id = auth.users.id). Created on first sign-in.
+ * Email is kept for the admin users page and ADMIN_EMAILS; never shown publicly.
+ */
+export const profiles = pgTable("profiles", {
+  id: uuid("id").primaryKey(),
+  email: text("email"),
+  displayName: varchar("display_name", { length: 80 }),
+  avatarUrl: text("avatar_url"),
+  role: varchar("role", { length: 10, enum: ["user", "editor", "admin"] }).notNull().default("user"),
+  banned: boolean("banned").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** A user's relation to a game: rating 1..10 and shelf flags. Row removed when all empty. */
+export const userGames = pgTable(
+  "user_games",
+  {
+    userId: uuid("user_id").notNull().references(() => profiles.id, { onDelete: "cascade" }),
+    gameId: integer("game_id").notNull().references(() => games.id, { onDelete: "cascade" }),
+    rating: smallint("rating"),
+    played: boolean("played").notNull().default(false),
+    own: boolean("own").notNull().default(false),
+    wishlist: boolean("wishlist").notNull().default(false),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.gameId] }), index("user_games_game_idx").on(t.gameId)],
 );

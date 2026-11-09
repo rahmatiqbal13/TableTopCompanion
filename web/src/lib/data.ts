@@ -14,21 +14,27 @@ export const POSTS_TAG = "posts";
 export async function getCatalog(): Promise<Catalog> {
   "use cache";
   cacheTag(CATALOG_TAG);
-  cacheLife("days");
+  cacheLife("hours"); // safety net; edits normally clear it at once (admin actions, Supabase webhook)
 
   if (!hasDatabase) {
     return { ...(seedCatalog as Omit<Catalog, "live" | "updatedAt">), live: false, updatedAt: null };
   }
   const d = db();
-  const [genres, criteria, games] = await Promise.all([
+  const ug = schema.userGames, pr = schema.profiles;
+  const [genres, criteria, games, community] = await Promise.all([
     d.select().from(schema.genres).orderBy(asc(schema.genres.name)),
     d.select().from(schema.criteria).orderBy(asc(schema.criteria.sort), asc(schema.criteria.id)),
     d.select().from(schema.games).orderBy(desc(schema.games.updatedAt)),
+    d.select({ gameId: ug.gameId, rating: sql<number>`avg(${ug.rating})::float8`, votes: sql<number>`count(${ug.rating})::int` })
+      .from(ug).innerJoin(pr, eq(pr.id, ug.userId))
+      .where(and(sql`${ug.rating} is not null`, eq(pr.banned, false)))
+      .groupBy(ug.gameId),
   ]);
+  const byGame = new Map(community.map((c) => [c.gameId, { rating: c.rating, votes: c.votes }]));
   return {
     genres,
     criteria,
-    games: games.map(({ updatedAt: _u, ...g }) => g),
+    games: games.map(({ updatedAt: _u, ...g }) => ({ ...g, community: byGame.get(g.id) ?? null })),
     live: true,
     updatedAt: games[0]?.updatedAt.toISOString() ?? null,
   };
@@ -45,7 +51,7 @@ const toPost = (r: PostRow): Post => ({
 export async function getPublishedPosts(): Promise<Post[]> {
   "use cache";
   cacheTag(POSTS_TAG);
-  cacheLife("days");
+  cacheLife("hours"); // safety net; edits normally clear it at once (admin actions, Supabase webhook)
 
   const rows: Post[] = hasDatabase
     ? (await db().select().from(schema.posts)
@@ -62,7 +68,7 @@ export async function getPublishedPosts(): Promise<Post[]> {
 export async function getPublishedPost(slug: string): Promise<Post | null> {
   "use cache";
   cacheTag(POSTS_TAG);
-  cacheLife("days");
+  cacheLife("hours"); // safety net; edits normally clear it at once (admin actions, Supabase webhook)
 
   if (!hasDatabase) return (seedPosts as Post[]).find((p) => p.slug === slug && p.status === "published") ?? null;
   const [row] = await db().select().from(schema.posts)
@@ -108,5 +114,69 @@ export async function getFeedbackStats(): Promise<FeedbackStats | null> {
   return {
     total: totals.total, up: totals.up, byRank, byScore, games,
     recent: recent.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() })),
+  };
+}
+
+export interface AdminUser {
+  id: string;
+  email: string | null;
+  name: string | null;
+  role: "user" | "editor" | "admin";
+  banned: boolean;
+  createdAt: string;
+  ratings: number;
+  shelf: number;
+}
+
+/** All accounts with activity counts, newest first. Not cached. */
+export async function getUsersForAdmin(): Promise<AdminUser[]> {
+  if (!hasDatabase) return [];
+  const p = schema.profiles, ug = schema.userGames;
+  const rows = await db().select({
+    id: p.id, email: p.email, name: p.displayName, role: p.role, banned: p.banned, createdAt: p.createdAt,
+    ratings: sql<number>`count(${ug.rating})::int`,
+    shelf: sql<number>`count(${ug.gameId})::int`,
+  }).from(p).leftJoin(ug, eq(ug.userId, p.id)).groupBy(p.id).orderBy(desc(p.createdAt));
+  return rows.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() }));
+}
+
+export interface AdminOverview {
+  games: { total: number; noImage: number; noBgg: number };
+  posts: { published: number; drafts: { id: number; title: string; type: string; updatedAt: string }[] };
+  users: { total: number; newThisWeek: number; ratings: number };
+  feedback: { total: number; thisWeek: number; up: number };
+}
+
+/** Numbers and to-dos for the admin dashboard. Not cached. */
+export async function getAdminOverview(): Promise<AdminOverview | null> {
+  if (!hasDatabase) return null;
+  const d = db();
+  const g = schema.games, p = schema.posts, pr = schema.profiles, ug = schema.userGames, f = schema.feedback;
+  const week = sql`now() - interval '7 days'`;
+  const [[games], [posts], drafts, [users], [ratings], [feedback]] = await Promise.all([
+    d.select({
+      total: sql<number>`count(*)::int`,
+      noImage: sql<number>`count(*) filter (where ${g.imageUrl} is null)::int`,
+      noBgg: sql<number>`count(*) filter (where ${g.bggId} is null)::int`,
+    }).from(g),
+    d.select({ published: sql<number>`count(*) filter (where ${p.status} = 'published')::int` }).from(p),
+    d.select({ id: p.id, text: p.text, type: p.type, updatedAt: p.updatedAt }).from(p)
+      .where(eq(p.status, "draft")).orderBy(desc(p.updatedAt)).limit(5),
+    d.select({ total: sql<number>`count(*)::int`, newThisWeek: sql<number>`count(*) filter (where ${pr.createdAt} > ${week})::int` }).from(pr),
+    d.select({ n: sql<number>`count(${ug.rating})::int` }).from(ug),
+    d.select({
+      total: sql<number>`count(*)::int`,
+      thisWeek: sql<number>`count(*) filter (where ${f.createdAt} > ${week})::int`,
+      up: sql<number>`count(*) filter (where ${f.vote} = 1)::int`,
+    }).from(f),
+  ]);
+  return {
+    games,
+    posts: {
+      published: posts.published,
+      drafts: drafts.map((r) => ({ id: r.id, type: r.type, title: r.text.id?.title || r.text.en?.title || "(untitled)", updatedAt: r.updatedAt.toISOString() })),
+    },
+    users: { ...users, ratings: ratings.n },
+    feedback,
   };
 }

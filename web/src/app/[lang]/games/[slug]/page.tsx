@@ -4,6 +4,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { Suspense } from "react";
 import { GameCard, PostCard } from "@/components/cards";
 import { Cover } from "@/components/cover";
+import { GameUserPanel } from "@/components/game-user-panel";
 import { PageSkeleton, SectionHeading } from "@/components/ui";
 import { YouTubeEmbed } from "@/components/youtube-embed";
 import { fmt, getDict, hasLocale, locales, type Dict } from "@/i18n";
@@ -143,6 +144,13 @@ async function GameHub({ params }: { params: Promise<{ lang: string; slug: strin
         </div>
 
         <aside className="space-y-6">
+          {catalog.live && (
+            <GameUserPanel gameId={game.id} labels={{
+              title: t.me.yourRating, hint: t.me.rateHint, clear: t.me.clear, played: t.me.played, own: t.me.own,
+              wishlist: t.me.wishlist, signInToRate: t.me.signInToRate, banned: t.me.banned, failed: t.me.failed, rateN: t.me.rateN,
+              loginHref: href(lang, "/login"),
+            }} />
+          )}
           <section className="rounded-2xl border border-line bg-card p-5">
             <h2 className="font-display text-lg font-semibold">{t.game.stats}</h2>
             <dl className="mt-3 divide-y divide-line text-sm">
@@ -150,6 +158,9 @@ async function GameHub({ params }: { params: Promise<{ lang: string; slug: strin
               <Row label={t.game.time} value={`${v.playTime} min`} />
               <Row label={t.game.weight} value={`${num(v.complexity, 2)} / 5`} />
               <Row label={t.game.rating} value={`${num(v.rating, 2)}${game.votes ? ` · ${fmt(t.game.votes, { n: game.votes.toLocaleString(t.intl) })}` : ""}`} />
+              <Row label={t.me.community} value={game.community
+                ? `${num(game.community.rating, 1)} · ${fmt(t.me.communityVotes, { n: game.community.votes })}`
+                : t.me.noCommunity} />
               <Row label={t.game.age} value={`${v.minAge}+`} />
               {game.bestPlayers.length > 0 && <Row label={t.game.best} value={game.bestPlayers.join(", ")} />}
               {game.recPlayers.length > 0 && <Row label={t.game.recommended} value={game.recPlayers.join(", ")} />}

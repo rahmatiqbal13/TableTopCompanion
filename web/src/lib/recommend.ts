@@ -215,10 +215,13 @@ export function utility(key: string, x: number, scale: Scale, pref: CriterionPre
 // ---------------------------------------------------------------------------
 
 /**
- * Bayesian average: (v·R + m·C) / (v + m). Ratings with few votes are pulled
- * toward a deliberately conservative prior C (the 25th-percentile rating),
- * the same idea as BGG's "Geek rating", so thin evidence cannot win on luck.
- * Prior strength m is the median vote count (at least 50).
+ * Bayesian average that blends BGG and TableTop Companion community ratings:
+ *   with a BGG vote count:    (v·R + n·L + m·C) / (v + n + m)
+ *   without one (old data):   (n·L + m·R) / (n + m)   (the BGG rating acts as the prior)
+ * v/R = BGG votes/average, n/L = community votes/average, C = a conservative
+ * prior (25th-percentile rating, like BGG's "Geek rating"), m = median vote
+ * count (at least 50). Thin evidence cannot win on luck, and as local players
+ * rate a game their opinion gradually takes over.
  */
 export function bayesianRatings(games: Game[]): Map<number, number> {
   const rated = games.filter((g) => Number.isFinite(g.values.rating));
@@ -227,10 +230,13 @@ export function bayesianRatings(games: Game[]): Map<number, number> {
   const votes = rated.map((g) => g.votes).filter((v): v is number => v !== null && v > 0).sort((a, b) => a - b);
   const m = Math.max(50, votes.length ? votes[Math.floor(votes.length / 2)] : 0);
   return new Map(
-    rated.map((g) => [
-      g.id,
-      g.votes === null ? g.values.rating : (g.votes * g.values.rating + m * prior) / (g.votes + m),
-    ]),
+    rated.map((g) => {
+      const n = g.community?.votes ?? 0, local = g.community?.rating ?? 0, R = g.values.rating;
+      const value = g.votes === null
+        ? (n * local + m * R) / (n + m)
+        : (g.votes * R + n * local + m * prior) / (g.votes + n + m);
+      return [g.id, value];
+    }),
   );
 }
 

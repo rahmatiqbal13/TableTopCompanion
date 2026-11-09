@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { LoginForm } from "@/components/admin-forms";
+import { AdminSignIn } from "@/components/admin-signin";
+
 import { isAdmin } from "@/lib/auth";
 import { getFeedbackStats, type FeedbackStats } from "@/lib/data";
 
@@ -18,7 +19,7 @@ const pct = (up: number, total: number) => (total ? `${Math.round((up / total) *
 
 async function Stats() {
   await connection();
-  if (!(await isAdmin())) return <LoginForm />;
+  if (!(await isAdmin())) return <AdminSignIn />;
   const s = await getFeedbackStats();
   const card = "rounded-2xl border border-line bg-card p-5";
   return (

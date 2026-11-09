@@ -5,7 +5,7 @@ import { eq, sql } from "drizzle-orm";
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { endSession, passwordMatches, requireAdmin, startSession } from "@/lib/auth";
+import { endSession, passwordMatches, requireAdmin, requireEditor, startSession } from "@/lib/auth";
 import { CATALOG_TAG, POSTS_TAG } from "@/lib/data";
 import { slugify } from "@/lib/format";
 import { parseYouTubeId } from "@/lib/youtube";
@@ -41,15 +41,18 @@ export async function logout() {
 
 const NO_DB = "No database connected (DATABASE_URL is not set), so changes cannot be saved.";
 
+type Level = "admin" | "editor";
+const check = (level: Level) => (level === "admin" ? requireAdmin() : requireEditor());
+
 /** For actions without a result: throws when not allowed. */
-async function guard() {
-  await requireAdmin();
+async function guard(level: Level = "admin") {
+  await check(level);
   if (!hasDatabase) throw new Error(NO_DB);
 }
 
 /** For form actions: returns an error message instead of throwing when the database is missing. */
-async function writeBlocked(): Promise<string | null> {
-  await requireAdmin();
+async function writeBlocked(level: Level = "admin"): Promise<string | null> {
+  await check(level);
   return hasDatabase ? null : NO_DB;
 }
 
@@ -104,7 +107,7 @@ export async function saveGame(_: FormState, form: FormData): Promise<FormState>
     return { error: e instanceof Error && /unique/i.test(e.message) ? "Another game already uses that BGG id." : "Could not save the game." };
   }
   updateTag(CATALOG_TAG);
-  redirect("/admin?saved=game");
+  redirect("/admin/catalog?saved=game");
 }
 
 export async function deleteGame(form: FormData) {
@@ -210,7 +213,7 @@ const langText = (form: FormData, lang: "id" | "en") => {
 };
 
 export async function savePost(_: FormState, form: FormData): Promise<FormState> {
-  const blocked = await writeBlocked();
+  const blocked = await writeBlocked("editor");
   if (blocked) return { error: blocked };
   const parsed = postSchema.safeParse(Object.fromEntries(form));
   if (!parsed.success) return { error: parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ") };
@@ -245,7 +248,7 @@ export async function savePost(_: FormState, form: FormData): Promise<FormState>
 }
 
 export async function deletePost(form: FormData) {
-  await guard();
+  await guard("editor");
   await db().delete(schema.posts).where(eq(schema.posts.id, Number(form.get("id"))));
   updateTag(POSTS_TAG);
 }
@@ -255,7 +258,7 @@ const MAX_UPLOAD = 4 * 1024 * 1024;
 
 /** Uploads an image to Vercel Blob and returns its public URL. */
 export async function uploadImage(form: FormData): Promise<{ url?: string; error?: string }> {
-  await requireAdmin();
+  await requireEditor();
   if (!process.env.BLOB_READ_WRITE_TOKEN) return { error: "Image upload needs a Vercel Blob store (BLOB_READ_WRITE_TOKEN)." };
   const file = form.get("file");
   if (!(file instanceof File) || !file.size) return { error: "Choose an image." };
@@ -266,4 +269,40 @@ export async function uploadImage(form: FormData): Promise<{ url?: string; error
     access: "public", addRandomSuffix: true, contentType: file.type,
   });
   return { url: blob.url };
+}
+
+// ---------------------------------------------------------------------------
+// Users (accounts): roles and blocking
+// ---------------------------------------------------------------------------
+
+/** Admins can't change their own role or block themselves (prevents lock-outs). */
+async function targetIsSelf(id: string) {
+  const { currentAccount } = await import("@/lib/account");
+  return (await currentAccount())?.profile.id === id;
+}
+
+const userId = z.uuid();
+
+export async function setUserRole(form: FormData) {
+  await guard();
+  const id = userId.parse(form.get("id"));
+  const role = z.enum(["user", "editor", "admin"]).parse(form.get("role"));
+  if (await targetIsSelf(id)) return;
+  await db().update(schema.profiles).set({ role }).where(eq(schema.profiles.id, id));
+}
+
+export async function setUserBanned(form: FormData) {
+  await guard();
+  const id = userId.parse(form.get("id"));
+  if (await targetIsSelf(id)) return;
+  await db().update(schema.profiles).set({ banned: form.get("banned") === "true" }).where(eq(schema.profiles.id, id));
+  // Blocked users' ratings drop out of the community averages.
+  updateTag(CATALOG_TAG);
+}
+
+/** "Refresh site data": use after editing tables directly in Supabase without a webhook. */
+export async function refreshSiteData() {
+  await requireEditor();
+  updateTag(CATALOG_TAG);
+  updateTag(POSTS_TAG);
 }

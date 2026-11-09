@@ -11,7 +11,7 @@ const game = (over: Partial<Game> & { id: number }): Game => ({
   bggId: null, name: `G${over.id}`, year: 2010, genreId: 1, imageUrl: null, linkUrl: null,
   values: { minPlayers: 2, rating: 7, complexity: 2, playTime: 30, minAge: 8 },
   maxPlayers: null, bestPlayers: [], recPlayers: [], votes: null, bggRank: null,
-  categories: [], mechanics: [], description: null, ...over,
+  categories: [], mechanics: [], description: null, community: null, ...over,
 });
 
 describe("recommend", () => {
@@ -134,6 +134,18 @@ describe("bayesian rating", () => {
   });
   it("leaves ratings without vote counts unchanged", () => {
     expect(bayesianRatings([game({ id: 1 })]).get(1)).toBe(7);
+  });
+  it("blends community ratings in, gradually", () => {
+    const few = bayesianRatings([game({ id: 1, community: { rating: 10, votes: 2 } })]).get(1)!;
+    const many = bayesianRatings([game({ id: 1, community: { rating: 10, votes: 500 } })]).get(1)!;
+    expect(few).toBeGreaterThan(7);
+    expect(few).toBeLessThan(7.2); // two fans can't swing it
+    expect(many).toBeGreaterThan(9.5); // a real local consensus takes over
+    const withBgg = bayesianRatings([
+      game({ id: 1, values: { rating: 8 }, votes: 1000 }),
+      game({ id: 2, values: { rating: 8 }, votes: 1000, community: { rating: 5, votes: 1000 } }),
+    ]);
+    expect(withBgg.get(2)!).toBeCloseTo(7, 6); // (1000·8 + 1000·5 + 1000·8) / 3000
   });
 });
 

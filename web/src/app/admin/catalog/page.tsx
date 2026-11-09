@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { CriterionForm, DeleteButton, GenreRow, LoginForm } from "@/components/admin-forms";
-import { adminConfigured, isAdmin } from "@/lib/auth";
+import { AdminSignIn } from "@/components/admin-signin";
+import { AdminSignOut } from "@/components/admin-sign-out";
+import { CriterionForm, DeleteButton, GenreRow } from "@/components/admin-forms";
+import { isAdmin } from "@/lib/auth";
 import { getCatalog } from "@/lib/data";
-import { deleteCriterion, deleteGame, logout } from "./actions";
+import { deleteCriterion, deleteGame, refreshSiteData } from "../actions";
 
-export const metadata: Metadata = { title: "Admin", robots: { index: false } };
+export const metadata: Metadata = { title: "Catalog · Admin", robots: { index: false } };
 
-export default function AdminPage() {
+export default function CatalogPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <Suspense fallback={<p className="text-muted">Loading…</p>}>
@@ -21,24 +23,10 @@ export default function AdminPage() {
 
 async function Gate() {
   await connection(); // always decide at request time, never at build time
-  if (!adminConfigured) return <SetupNotice />;
-  if (!(await isAdmin())) return <LoginForm />;
+  if (!(await isAdmin())) return <AdminSignIn next="/admin/catalog" />;
   return <Dashboard />;
 }
 
-function SetupNotice() {
-  return (
-    <div className="mx-auto max-w-xl rounded-2xl border border-line bg-card p-6 text-sm leading-relaxed">
-      <h1 className="font-display text-xl font-semibold">Admin is not configured</h1>
-      <p className="mt-2">Set these environment variables (Vercel → Project → Settings → Environment Variables), then redeploy:</p>
-      <ul className="mt-2 list-disc pl-5 font-mono text-xs">
-        <li>ADMIN_PASSWORD</li>
-        <li>SESSION_SECRET (at least 32 random characters)</li>
-        <li>DATABASE_URL (Supabase → Connect → Transaction pooler URI)</li>
-      </ul>
-    </div>
-  );
-}
 
 async function Dashboard() {
   const catalog = await getCatalog();
@@ -52,7 +40,13 @@ async function Dashboard() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Catalog</h1>
-        <form action={logout}><button className="text-sm text-muted underline">Sign out</button></form>
+        <div className="flex items-center gap-4">
+          <form action={refreshSiteData}>
+            <button className="rounded-lg border border-line px-3 py-1.5 text-sm hover:bg-sunken"
+              title="Use after editing tables directly in Supabase">↻ Refresh site data</button>
+          </form>
+          <AdminSignOut />
+        </div>
       </div>
       {!catalog.live && (
         <p role="status" className="rounded-xl border border-gold/40 bg-card p-4 text-sm">

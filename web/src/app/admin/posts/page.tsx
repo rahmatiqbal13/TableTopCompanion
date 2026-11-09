@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { DeleteButton, LoginForm } from "@/components/admin-forms";
-import { isAdmin } from "@/lib/auth";
+import { AdminSignIn } from "@/components/admin-signin";
+import { DeleteButton } from "@/components/admin-forms";
+import { canEdit } from "@/lib/auth";
 import { getAllPostsForAdmin } from "@/lib/data";
 import { postHref, postText } from "@/lib/i18n-paths";
 import { deletePost } from "../actions";
@@ -19,7 +20,7 @@ export default function PostsAdminPage() {
 
 async function PostList() {
   await connection();
-  if (!(await isAdmin())) return <LoginForm />;
+  if (!(await canEdit())) return <AdminSignIn />;
   const posts = await getAllPostsForAdmin();
   return (
     <div className="space-y-6">

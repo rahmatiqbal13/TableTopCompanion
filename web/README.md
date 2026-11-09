@@ -54,6 +54,43 @@ Supabase note: the tables live in the `public` schema, which Supabase also expos
 Migration `0002_enable_rls.sql` turns on Row Level Security with no policies, which closes that API;
 the app connects directly as the owner and is unaffected. Keep it that way unless you add policies on purpose.
 
+## Accounts (phase 2)
+
+Visitors browse and use the recommender without an account. Signing in (Google, or an emailed link,
+no passwords) lets them rate games 1–10, mark Played / Own / Wishlist, see "My games", and get
+recommendations from their favourites. Ratings from non-blocked users form the **community rating**,
+which the recommender blends with BGG's (see `bayesianRatings` in `src/lib/recommend.ts`).
+
+Setup, once:
+1. Supabase → Project Settings → API: copy **Project URL** and the **anon / publishable key** into
+   `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (locally in `.env.local`, and in Vercel).
+2. Supabase → Authentication → URL Configuration: **Site URL** = your production URL; add
+   **Redirect URLs** `http://localhost:3000/**` and `https://<your-domain>/**`.
+3. Google sign-in: create an OAuth client (Web application) in Google Cloud Console with the
+   redirect URI `https://<project-ref>.supabase.co/auth/v1/callback`, then paste its Client ID and
+   Secret into Supabase → Authentication → Providers → Google.
+4. Email links: Supabase's built-in mailer is for testing only (a few emails per hour, to your team's
+   addresses). For real users, add custom SMTP (e.g. Resend) under Authentication → Emails → SMTP.
+5. Set `ADMIN_EMAILS=you@example.com` so your account becomes admin on first sign-in.
+
+Roles (Admin → Users): **user**, **editor** (posts only) and **admin** (everything). Blocking a user
+stops them rating and removes their ratings from the community score. The shared `ADMIN_PASSWORD`
+still works as a backup way into `/admin`.
+
+## Managing data in Supabase
+
+All data lives in Supabase (`games`, `genres`, `criteria`, `posts`, `profiles`, `user_games`, `feedback`).
+You can edit it in the site's `/admin` or directly in **Supabase → Table Editor**. Notes for the Table Editor:
+- `games.values` holds the criteria as JSON, e.g. `{"rating": 7.1, "complexity": 1.2, "playTime": 15, "minAge": 8, "minPlayers": 2}`.
+- `best_players`, `rec_players`, `mechanics`, `categories` are JSON arrays, e.g. `[3, 4]` or `["Set Collection"]`.
+- To make someone admin: `profiles` → their row → `role` = `admin` (they must have signed in once), or use `ADMIN_EMAILS`.
+
+The site caches data, so make Supabase tell it about changes, once:
+**Supabase → Database → Webhooks → Create** for each of `games`, `genres`, `criteria`, `posts`, `profiles`:
+events Insert/Update/Delete, type HTTP Request, method POST,
+URL `https://<your-domain>/api/revalidate`, header `x-revalidate-secret: <REVALIDATE_SECRET>`.
+Without webhooks, press **↻ Refresh site data** in `/admin` after editing (or wait up to an hour).
+
 ## Writing content
 
 `/admin/posts` → **New post**. Each post has a type (news, review, video, guide), a status (draft/published),
@@ -78,7 +115,10 @@ npm run db:setup -- --reseed                                  # push src/data/se
 ```
 src/
   app/[lang]/           public pages (home, recommend, games, news, reviews, videos, guides, method)
-  app/admin/            admin pages and server actions (every action checks the session)
+  app/admin/            admin pages and server actions (every action checks the role)
+  app/auth/callback/    finishes Google / email sign-in
+  lib/supabase/         Supabase Auth clients (browser, server) and config
+  lib/account.ts        profiles, roles, ADMIN_EMAILS
   components/           UI; recommender.tsx and content-pages.tsx are the big ones
   i18n/                 en.ts, id.ts dictionaries (same shape, enforced by type and test)
   lib/topsis.ts         pure TOPSIS engine (benefit / cost / target criteria)

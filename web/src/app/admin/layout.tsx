@@ -8,9 +8,11 @@ export const metadata: Metadata = { title: "Admin · TableTop Companion", robots
 
 export default function AdminLayout({ children }: LayoutProps<"/admin">) {
   const links = [
-    { href: "/admin", label: "Catalog" },
+    { href: "/admin", label: "Dashboard" },
+    { href: "/admin/catalog", label: "Catalog" },
     { href: "/admin/posts", label: "Posts" },
     { href: "/admin/feedback", label: "Feedback" },
+    { href: "/admin/users", label: "Users" },
   ];
   return (
     <html lang="en" className={fontClasses}>

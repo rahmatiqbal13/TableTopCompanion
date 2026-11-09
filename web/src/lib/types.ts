@@ -42,6 +42,8 @@ export interface Game {
   categories: string[];
   mechanics: string[];
   description: string | null;
+  /** Ratings from TableTop Companion users (not banned), when there are any. */
+  community?: { rating: number; votes: number } | null;
 }
 
 export interface Catalog {

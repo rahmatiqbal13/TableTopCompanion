@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { otherLocale, type Dict, type Locale } from "@/i18n";
 import { href } from "@/lib/i18n-paths";
+import { authConfigured } from "@/lib/supabase/config";
+import { AuthMenu } from "./auth-menu";
 import { LanguageSwitch } from "./language-switch";
 
 export function SiteHeader({ lang, t }: { lang: Locale; t: Dict }) {
@@ -22,6 +24,9 @@ export function SiteHeader({ lang, t }: { lang: Locale; t: Dict }) {
         </Link>
         <div className="ml-auto flex items-center gap-2">
           <LanguageSwitch to={other} label={otherDict.label} short={otherDict.short} />
+          {authConfigured && (
+            <AuthMenu lang={lang} labels={{ signIn: t.auth.signIn, account: t.auth.account, myGames: t.auth.myGames, admin: t.nav.admin, signOut: t.auth.signOut }} />
+          )}
         </div>
       </div>
       <nav aria-label={t.nav.menu} className="mx-auto max-w-6xl overflow-x-auto px-2 pb-2 [scrollbar-width:none]">

@@ -44,4 +44,16 @@ it("migrates, seeds, and keeps sequences usable", async () => {
   expect(rows[0].vote).toBe(-1);
   await db.delete(schema.games).where(eq(schema.games.id, created.id));
   expect(await db.select().from(schema.feedback)).toHaveLength(0); // cascades with the game
+
+  // Accounts: one row per (user, game); removing a profile removes their shelf.
+  const uid = "0b6c7a3e-9a1d-4c2e-8f3b-5d6e7f8a9b0c";
+  await db.insert(schema.profiles).values({ id: uid, email: "a@example.com" });
+  await db.insert(schema.userGames).values({ userId: uid, gameId: sushi.id, rating: 9, played: true });
+  await db.insert(schema.userGames).values({ userId: uid, gameId: sushi.id, rating: 7 })
+    .onConflictDoUpdate({ target: [schema.userGames.userId, schema.userGames.gameId], set: { rating: 7 } });
+  const shelf = await db.select().from(schema.userGames);
+  expect(shelf).toHaveLength(1);
+  expect(shelf[0]).toMatchObject({ rating: 7, played: true });
+  await db.delete(schema.profiles).where(eq(schema.profiles.id, uid));
+  expect(await db.select().from(schema.userGames)).toHaveLength(0);
 });

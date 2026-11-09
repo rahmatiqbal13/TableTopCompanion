@@ -4,9 +4,12 @@ import Link from "next/link";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { sendFeedback } from "@/app/actions";
+import { getMyGames } from "@/app/account-actions";
+import { supabaseBrowser } from "@/lib/supabase/browser";
 import { fmt, type Dict, type Locale } from "@/i18n";
 import { criterionHint, criterionName, genreName, reasonText } from "@/lib/format";
 import { gameHref } from "@/lib/i18n-paths";
+import { applyAnswer, applyOrder, orderFromCriteria, QUESTIONS, selectedOption } from "@/lib/priorities";
 import {
   DERIVED, PLAYER_FIT, PRESETS, TASTE, defaultPreferences, explain, fromSearchParams, recommend,
   toSearchParams, type CriterionPref, type Preferences, type Recommendation, type RecommendationResult,
@@ -174,23 +177,171 @@ function PriorityPanel({ catalog, t, lang, prefs, setPrefs, setCriterion, update
         })}
       </div>
       <FavouritePicker catalog={catalog} t={t} lang={lang} prefs={prefs} update={update} />
-      <div className="divide-y divide-line">
-        {[...catalog.criteria, ...DERIVED].map((c) => {
-          const inactive =
-            c.key === PLAYER_FIT && prefs.groupSize === null ? t.rec.needPlayers :
-            c.key === TASTE && !prefs.favourites.length ? t.rec.needFavourite : null;
-          return (
-            <CriterionRow key={c.key} criterion={c} pref={prefs.criteria[c.key]} inactive={inactive} t={t}
-              derived={c.id < 0} onChange={(patch) => setCriterion(c.key, patch)} catalog={catalog} />
-          );
-        })}
-      </div>
+      <PriorityModes catalog={catalog} t={t} lang={lang} prefs={prefs} setPrefs={setPrefs} setCriterion={setCriterion} />
       <label className="flex items-start gap-2.5 text-sm">
         <input type="checkbox" checked={prefs.diversify} onChange={(e) => update({ diversify: e.target.checked })} className="mt-0.5 accent-[var(--felt)]" />
         <span><span className="font-medium">{t.rec.mix}</span>
           <span className="block text-xs text-muted">{t.rec.mixHint}</span></span>
       </label>
     </Panel>
+  );
+}
+
+type Mode = "questions" | "rank" | "advanced";
+const MODES: Mode[] = ["questions", "rank", "advanced"];
+
+/** Three ways to edit the same criteria: quick questions, a ranking, or sliders. */
+function PriorityModes({ catalog, t, prefs, setPrefs, setCriterion }: Ctx & {
+  prefs: Preferences;
+  setPrefs: React.Dispatch<React.SetStateAction<Preferences>>;
+  setCriterion: (key: string, patch: Partial<CriterionPref>) => void;
+}) {
+  const [mode, setMode] = useState<Mode>("questions");
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("ttc-priority-mode") as Mode | null;
+      // Read after mount so server and client render the same markup.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (saved && MODES.includes(saved)) setMode(saved);
+    } catch { /* storage unavailable */ }
+  }, []);
+  const choose = (m: Mode) => {
+    setMode(m);
+    try { localStorage.setItem("ttc-priority-mode", m); } catch { /* ignore */ }
+  };
+  const inactive = (key: string) =>
+    key === PLAYER_FIT && prefs.groupSize === null ? t.rec.needPlayers :
+    key === TASTE && !prefs.favourites.length ? t.rec.needFavourite : null;
+
+  return (
+    <div>
+      <div role="tablist" aria-label={t.rec.matters} className="grid grid-cols-3 rounded-lg border border-line p-0.5 text-xs">
+        {MODES.map((m) => (
+          <button key={m} type="button" role="tab" aria-selected={mode === m} onClick={() => choose(m)}
+            className={`rounded-md px-2 py-1.5 font-medium ${mode === m ? "bg-felt text-on-felt" : "text-muted hover:text-ink"}`}>
+            {t.rec.modes[m]}
+          </button>
+        ))}
+      </div>
+      <div className="mt-3" role="tabpanel">
+        {mode === "questions" && <QuestionsEditor t={t} prefs={prefs} setPrefs={setPrefs} />}
+        {mode === "rank" && <RankEditor catalog={catalog} t={t} prefs={prefs} setPrefs={setPrefs} inactive={inactive} />}
+        {mode === "advanced" && (
+          <div className="divide-y divide-line">
+            {[...catalog.criteria, ...DERIVED].map((c) => (
+              <CriterionRow key={c.key} criterion={c} pref={prefs.criteria[c.key]} inactive={inactive(c.key)} t={t}
+                derived={c.id < 0} onChange={(patch) => setCriterion(c.key, patch)} catalog={catalog} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function QuestionsEditor({ t, prefs, setPrefs }: {
+  t: Dict; prefs: Preferences; setPrefs: React.Dispatch<React.SetStateAction<Preferences>>;
+}) {
+  return (
+    <div className="space-y-4">
+      <p className="text-xs text-muted">{t.rec.questionsHint}</p>
+      {QUESTIONS.map((q) => {
+        const text = t.rec.questions[q.id] as Record<string, string>;
+        const selected = selectedOption(prefs.criteria, q);
+        return (
+          <fieldset key={q.id}>
+            <legend className="mb-1.5 text-sm font-medium">{text.title}</legend>
+            <div className="flex flex-wrap gap-1.5">
+              {q.options.map((o) => (
+                <Chip key={o.id} active={selected === o.id}
+                  onClick={() => setPrefs((p) => ({ ...p, criteria: applyAnswer(p.criteria, q, o.id) }))}>
+                  {text[o.id]}
+                </Chip>
+              ))}
+            </div>
+          </fieldset>
+        );
+      })}
+    </div>
+  );
+}
+
+function RankEditor({ catalog, t, prefs, setPrefs, inactive }: {
+  catalog: Catalog; t: Dict; prefs: Preferences;
+  setPrefs: React.Dispatch<React.SetStateAction<Preferences>>;
+  inactive: (key: string) => string | null;
+}) {
+  const all = [...catalog.criteria, ...DERIVED];
+  const keys = all.map((c) => c.key);
+  const byKey = new Map(all.map((c) => [c.key, c]));
+  // Keep the user's exact order locally: low ranks can share a rounded
+  // importance, and re-deriving the order from importances would undo moves.
+  // Re-read it only when the criteria change from outside (preset, reset).
+  // Criteria that don't apply yet (no favourites / no player count) go last,
+  // so they don't take weight away from the ones that count.
+  const derive = (criteria: Preferences["criteria"]) => {
+    const o = orderFromCriteria(criteria, keys);
+    return [...o.filter((k) => !inactive(k)), ...o.filter((k) => inactive(k))];
+  };
+  const [state, setState] = useState(() => ({ order: derive(prefs.criteria), source: prefs.criteria }));
+  let order = state.order;
+  if (state.source !== prefs.criteria) {
+    const ownResult = applyOrder(state.source, state.order, keys);
+    const unchanged = keys.every((k) => prefs.criteria[k]?.importance === ownResult[k].importance);
+    if (!unchanged) order = derive(prefs.criteria);
+    setState({ order, source: prefs.criteria });
+  }
+  const commit = (next: string[]) => {
+    setState({ order: next, source: prefs.criteria });
+    setPrefs((p) => ({ ...p, criteria: applyOrder(p.criteria, next, keys) }));
+  };
+  const move = (i: number, d: -1 | 1) => {
+    const next = [...order];
+    [next[i], next[i + d]] = [next[i + d], next[i]];
+    commit(next);
+  };
+  const off = keys.filter((k) => !order.includes(k));
+  const iconBtn = "grid size-8 place-items-center rounded-md border border-line text-muted hover:bg-sunken hover:text-ink disabled:opacity-30";
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-muted">{t.rec.rankHint}</p>
+      <ol className="space-y-1.5">
+        {order.map((k, i) => {
+          const c = byKey.get(k)!;
+          const name = criterionName(t, c);
+          const note = inactive(k);
+          return (
+            <li key={k} className="flex items-center gap-2 rounded-lg border border-line bg-paper py-1.5 pl-3 pr-1.5">
+              <span className="w-4 text-xs font-semibold tabular text-felt">{i + 1}</span>
+              <span className="min-w-0 flex-1 text-sm">
+                <span className="font-medium">{name}</span>
+                {note && <span className="block text-xs text-muted">{note}</span>}
+              </span>
+              <button type="button" className={iconBtn} disabled={i === 0} aria-label={fmt(t.rec.moveUp, { name })} onClick={() => move(i, -1)}>▲</button>
+              <button type="button" className={iconBtn} disabled={i === order.length - 1} aria-label={fmt(t.rec.moveDown, { name })} onClick={() => move(i, 1)}>▼</button>
+              <button type="button" className={iconBtn} aria-label={fmt(t.rec.remove, { name })} onClick={() => commit(order.filter((x) => x !== k))}>×</button>
+            </li>
+          );
+        })}
+      </ol>
+      {off.length > 0 && (
+        <div>
+          <p className="mb-1.5 text-xs text-muted">{t.rec.notImportant}</p>
+          <div className="flex flex-wrap gap-1.5">
+            {off.map((k) => {
+              const name = criterionName(t, byKey.get(k)!);
+              return (
+                <button key={k} type="button" aria-label={fmt(t.rec.add, { name })} onClick={() => commit([...order, k])}
+                  className="rounded-full border border-dashed border-line px-3 py-1 text-sm text-muted hover:border-muted hover:text-ink">
+                  + {name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -241,14 +392,42 @@ function CriterionRow({ criterion: c, pref, onChange, inactive, derived, catalog
   );
 }
 
+/** Ids of the signed-in user's top-rated games (8+), best first; empty when signed out. */
+function useMyTopRated(catalog: Catalog): number[] {
+  const [ids, setIds] = useState<number[]>([]);
+  useEffect(() => {
+    const sb = catalog.live ? supabaseBrowser() : null;
+    if (!sb) return;
+    let alive = true;
+    sb.auth.getSession().then(async ({ data }) => {
+      if (!data.session) return;
+      const rows = (await getMyGames()) ?? [];
+      const known = new Set(catalog.games.map((g) => g.id));
+      const top = rows.filter((r) => (r.rating ?? 0) >= 8 && known.has(r.gameId))
+        .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0)).slice(0, 10).map((r) => r.gameId);
+      if (alive) setIds(top);
+    });
+    return () => { alive = false; };
+  }, [catalog]);
+  return ids;
+}
+
 function FavouritePicker({ catalog, t, prefs, update }: Ctx & { prefs: Preferences; update: (p: Partial<Preferences>) => void }) {
   const [q, setQ] = useState("");
+  const mine = useMyTopRated(catalog);
+  const allMineIn = mine.every((id) => prefs.favourites.includes(id));
   const favs = prefs.favourites.map((id) => catalog.games.find((g) => g.id === id)).filter((g): g is Game => Boolean(g));
   const matches = q.trim().length < 2 ? [] : catalog.games
     .filter((g) => !prefs.favourites.includes(g.id) && g.name.toLowerCase().includes(q.trim().toLowerCase()))
     .slice(0, 6);
   return (
     <Field label={t.rec.love} hint={t.rec.loveHint}>
+      {mine.length > 0 && !allMineIn && (
+        <button type="button" onClick={() => update({ favourites: mine })}
+          className="mb-2 w-full rounded-lg border border-felt/40 bg-felt-soft px-3 py-1.5 text-left text-sm hover:opacity-90">
+          ★ {fmt(t.rec.useMine, { n: mine.length })}
+        </button>
+      )}
       {favs.length > 0 && (
         <ul className="mb-2 flex flex-wrap gap-1.5">
           {favs.map((g) => (

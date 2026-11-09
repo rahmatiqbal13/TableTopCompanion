@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { LoginForm } from "@/components/admin-forms";
+import { AdminSignIn } from "@/components/admin-signin";
+
 import { PostEditor } from "@/components/post-editor";
-import { isAdmin } from "@/lib/auth";
+import { canEdit } from "@/lib/auth";
 import { getAllPostsForAdmin, getCatalog } from "@/lib/data";
 
 export default function EditPostPage({ params }: PageProps<"/admin/posts/[id]">) {
@@ -18,7 +19,7 @@ export default function EditPostPage({ params }: PageProps<"/admin/posts/[id]">)
 }
 
 async function Editor({ params }: { params: Promise<{ id: string }> }) {
-  if (!(await isAdmin())) return <LoginForm />;
+  if (!(await canEdit())) return <AdminSignIn />;
   const { id } = await params;
   const [posts, catalog] = await Promise.all([getAllPostsForAdmin(), getCatalog()]);
   const post = id === "new" ? null : posts.find((p) => p.id === Number(id));
