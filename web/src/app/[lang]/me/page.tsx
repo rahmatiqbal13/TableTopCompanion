@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { PageHero } from "@/components/ui";
 import { MyGames } from "@/components/my-games";
 import { getDict, hasLocale } from "@/i18n";
 import { getCatalog } from "@/lib/data";
@@ -18,10 +19,11 @@ export default async function MePage({ params }: PageProps<"/[lang]/me">) {
   // The page itself is static; your shelf loads in the browser.
   const games = catalog.games.map(({ id, name, year, imageUrl }) => ({ id, name, year, imageUrl }));
   return (
-    <div className="mx-auto max-w-4xl px-4 pb-20 pt-10">
-      <h1 className="font-display text-3xl font-semibold tracking-tight">{t.auth.myGames}</h1>
-      <p className="mt-2 mb-8 text-muted">{t.me.intro}</p>
-      <MyGames games={games} t={t} lang={lang} />
-    </div>
+    <>
+      <PageHero kicker={t.heroes.me.kicker} title={t.heroes.me.title} sub={t.me.intro} width="max-w-4xl" />
+      <div className="mx-auto max-w-4xl px-4 pb-24 pt-12">
+        <MyGames games={games} t={t} lang={lang} />
+      </div>
+    </>
   );
 }

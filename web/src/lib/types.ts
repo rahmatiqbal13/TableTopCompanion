@@ -81,6 +81,8 @@ export interface PostText {
   forWho?: string;
   /** Reviews: who should pass. */
   skip?: string;
+  /** Estimated reading time; set on list payloads, where the body is dropped. */
+  readMinutes?: number;
 }
 
 export interface Post {

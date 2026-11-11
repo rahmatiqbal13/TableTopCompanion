@@ -51,6 +51,9 @@ const toPost = (r: PostRow): Post => ({
 });
 
 /** Published posts, newest first, without bodies (for listings). */
+/** About 200 words a minute, at least one. */
+const readMinutes = (body: string | undefined) => Math.max(1, Math.round((body?.split(/\s+/).filter(Boolean).length ?? 0) / 200));
+
 export async function getPublishedPosts(): Promise<Post[]> {
   "use cache";
   cacheTag(POSTS_TAG);
@@ -63,7 +66,7 @@ export async function getPublishedPosts(): Promise<Post[]> {
     : (seedPosts as Post[]).filter((p) => p.status === "published");
   return rows.map((p) => ({
     ...p,
-    text: Object.fromEntries(Object.entries(p.text).map(([l, t]) => [l, { ...t, body: "" }])),
+    text: Object.fromEntries(Object.entries(p.text).map(([l, t]) => [l, { ...t, body: "", readMinutes: readMinutes(t.body) }])),
   }));
 }
 

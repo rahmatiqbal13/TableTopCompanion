@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { sendFeedback } from "@/app/actions";
+import { FeedbackButtons, useVotes, type Vote } from "./feedback";
 import { getMyGames } from "@/app/account-actions";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import { fmt, type Dict, type Locale } from "@/i18n";
@@ -16,6 +16,7 @@ import {
 } from "@/lib/recommend";
 import type { Catalog, Criterion, CriterionType, Game } from "@/lib/types";
 import { Cover } from "./cover";
+import { DealtHand, FeltTable, INITIAL, MOODS, TableControls, moodCriteria, type TableSettings } from "./tonight-table";
 import { Chip, Field, Panel } from "./ui";
 
 const PAGE = 10;
@@ -28,7 +29,10 @@ interface Ctx {
 
 export function Recommender({ catalog, t, lang }: Ctx) {
   const params = useSearchParams();
-  const [prefs, setPrefs] = useState<Preferences>(() => fromSearchParams(new URLSearchParams(params), catalog));
+  // A bare /recommend starts from the same table as the home page.
+  const [prefs, setPrefs] = useState<Preferences>(() => params.size
+    ? fromSearchParams(new URLSearchParams(params), catalog)
+    : { ...defaultPreferences(catalog), groupSize: INITIAL.players, maxTime: INITIAL.time, youngestAge: INITIAL.age, criteria: moodCriteria(catalog, INITIAL.mood) });
   const deferred = useDeferredValue(prefs);
   const result = useMemo(() => recommend(catalog, deferred), [catalog, deferred]);
   const [shown, setShown] = useState(PAGE);
@@ -52,32 +56,61 @@ export function Recommender({ catalog, t, lang }: Ctx) {
   const setCriterion = (key: string, patch: Partial<CriterionPref>) =>
     setPrefs((p) => ({ ...p, criteria: { ...p.criteria, [key]: { ...p.criteria[key], ...patch } } }));
 
+  // The felt controls speak in moods; a mood is a preset that leaves taste and player fit alone.
+  const withDerived = (values: Record<string, CriterionPref>) => {
+    for (const d of DERIVED) values[d.key] = prefs.criteria[d.key];
+    return values;
+  };
+  const mood = MOODS.find((m) => samePrefs(prefs.criteria, withDerived(moodCriteria(catalog, m)))) ?? null;
+  const table = { players: prefs.groupSize, time: prefs.maxTime, age: prefs.youngestAge, mood };
+  const onTable = (patch: Partial<TableSettings>) => {
+    const next: Partial<Preferences> = {};
+    if ("players" in patch) next.groupSize = patch.players ?? null;
+    if ("time" in patch) next.maxTime = patch.time ?? null;
+    if ("age" in patch) next.youngestAge = patch.age ?? null;
+    if (patch.mood) next.criteria = withDerived(moodCriteria(catalog, patch.mood));
+    update(next);
+  };
+  const h = t.heroes.recommend;
+
   return (
-    <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 pb-16 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
-      <aside className="min-w-0 space-y-4 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:pr-1">
-        <a href="#results" className="block rounded-xl bg-felt py-2.5 text-center text-sm font-medium text-on-felt lg:hidden">
-          {fmt(t.rec.seeResults, { n: result.candidates.length })}
-        </a>
-        <TonightPanel {...ctx} prefs={prefs} update={update} />
-        <PriorityPanel {...ctx} prefs={prefs} setPrefs={setPrefs} setCriterion={setCriterion} update={update} />
-      </aside>
-      <section id="results" aria-live="polite" className="min-w-0 scroll-mt-4 space-y-4">
-        <Summary {...ctx} result={result} prefs={deferred} update={update} />
-        <ol className="space-y-3">
-          {result.items.slice(0, shown).map((rec) => (
-            <ResultCard key={rec.game.id} {...ctx} rec={rec} result={result} prefs={deferred}
-              feedback={catalog.live ? { vote: votes.get(rec.game.id), onVote: (v) => votes.cast(rec, v, query, lang) } : null} />
-          ))}
-        </ol>
-        {result.items.length > shown && (
-          <button onClick={() => setShown((s) => s + PAGE)}
-            className="w-full rounded-xl border border-line bg-card py-2.5 text-sm font-medium hover:bg-sunken">
-            {fmt(t.rec.showMore, { n: Math.min(PAGE, result.items.length - shown) })}
-          </button>
-        )}
-        {result.topsis && <MathPanel t={t} result={result} prefs={deferred} />}
-      </section>
-    </div>
+    <>
+      <FeltTable kicker={h.kicker} title={h.title} subtitle={h.sub} fit={result.candidates.length} total={catalog.games.length} t={t}>
+        <TableControls t={t} value={table} onChange={onTable} />
+        <DealtHand catalog={catalog} t={t} lang={lang} result={result} prefs={deferred} votes={votes} query={query}
+          allHref="#peringkat" dealKey={query}
+          onReset={() => update({ groupSize: INITIAL.players, maxTime: INITIAL.time, youngestAge: INITIAL.age, genres: [], yearFrom: null, yearTo: null })} />
+      </FeltTable>
+
+      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 pt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
+        <section id="peringkat" aria-live="polite" className="min-w-0 scroll-mt-4">
+          <div className="mb-4 flex flex-wrap items-baseline justify-between gap-4 border-b-2 border-ink pb-3.5">
+            <h2 className="font-display text-[clamp(32px,4vw,48px)] font-bold tracking-[-0.035em]">{t.rec.allTitle}</h2>
+          </div>
+          <div className="mb-4"><Summary {...ctx} result={result} prefs={deferred} update={update} /></div>
+          {result.items.length > 0 && (
+            <ol className="overflow-hidden rounded-[18px] border border-line bg-card">
+              {result.items.slice(0, shown).map((rec) => (
+                <ResultCard key={rec.game.id} {...ctx} rec={rec} result={result} prefs={deferred}
+                  feedback={catalog.live ? { vote: votes.get(rec.game.id), onVote: (v) => votes.cast(rec, v, query, lang) } : null} />
+              ))}
+            </ol>
+          )}
+          {result.items.length > shown && (
+            <button onClick={() => setShown((s) => s + PAGE)}
+              className="mt-3 min-h-11 w-full cursor-pointer rounded-full border border-line bg-card text-sm font-medium hover:bg-sunken">
+              {fmt(t.rec.showMore, { n: Math.min(PAGE, result.items.length - shown) })}
+            </button>
+          )}
+          {result.topsis && <div className="mt-6"><MathPanel t={t} result={result} prefs={deferred} /></div>}
+        </section>
+        <aside className="min-w-0 space-y-4 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:self-start lg:overflow-y-auto lg:pr-1">
+          <h2 className="font-display text-2xl font-semibold tracking-[-0.02em]">{t.rec.finer}</h2>
+          <TonightPanel {...ctx} prefs={prefs} update={update} />
+          <PriorityPanel {...ctx} prefs={prefs} setPrefs={setPrefs} setCriterion={setCriterion} update={update} />
+        </aside>
+      </div>
+    </>
   );
 }
 
@@ -89,37 +122,7 @@ function TonightPanel({ catalog, t, prefs, update }: Ctx & { prefs: Preferences;
   const years = catalog.games.map((g) => g.year);
   const [minYear, maxYear] = [Math.min(...years), Math.max(...years)];
   return (
-    <Panel title={t.rec.tonight}>
-      <Field label={t.rec.players} hint={prefs.groupSize === null ? t.rec.playersAny : t.rec.playersHint}>
-        <div className="flex items-center gap-2">
-          <button type="button" aria-label={t.rec.fewer} onClick={() => update({ groupSize: Math.max(1, (prefs.groupSize ?? 2) - 1) })}
-            className="size-9 rounded-lg border border-line text-lg hover:bg-sunken">−</button>
-          <span className="w-10 text-center font-display text-xl tabular">{prefs.groupSize ?? "–"}</span>
-          <button type="button" aria-label={t.rec.more} onClick={() => update({ groupSize: Math.min(20, (prefs.groupSize ?? 1) + 1) })}
-            className="size-9 rounded-lg border border-line text-lg hover:bg-sunken">+</button>
-          {prefs.groupSize !== null && (
-            <button type="button" onClick={() => update({ groupSize: null })} className="ml-auto text-xs text-muted underline">{t.rec.any}</button>
-          )}
-        </div>
-      </Field>
-      <Field label={t.rec.youngest}>
-        <div className="flex flex-wrap gap-1.5">
-          {[null, 6, 8, 10, 12, 14].map((a) => (
-            <Chip key={a ?? "any"} active={prefs.youngestAge === a} onClick={() => update({ youngestAge: a })}>
-              {a === null ? t.rec.any : `${a}`}
-            </Chip>
-          ))}
-        </div>
-      </Field>
-      <Field label={t.rec.time}>
-        <div className="flex flex-wrap gap-1.5">
-          {[null, 30, 60, 90, 120, 180].map((m) => (
-            <Chip key={m ?? "any"} active={prefs.maxTime === m} onClick={() => update({ maxTime: m })}>
-              {m === null ? t.rec.any : m < 60 ? `${m}m` : `${(m / 60).toLocaleString(t.intl)}h`}
-            </Chip>
-          ))}
-        </div>
-      </Field>
+    <Panel title={t.rec.filters}>
       <Field label={t.rec.genres} hint={prefs.genres.length ? fmt(t.rec.genresSelected, { n: prefs.genres.length }) : t.rec.genresAll}>
         <div className="flex flex-wrap gap-1.5">
           {catalog.genres.map((g) => (
@@ -488,61 +491,6 @@ function Summary({ catalog, t, result, prefs, update }: Ctx & { result: Recommen
   );
 }
 
-type Vote = 1 | -1;
-
-/** Anonymous per-browser id and votes, kept in localStorage. */
-function useVotes() {
-  const [votes, setVotes] = useState<Record<number, Vote>>({});
-  useEffect(() => {
-    try {
-      // Read after mount so server and client render the same markup.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setVotes(JSON.parse(localStorage.getItem("ttc-votes") ?? "{}"));
-    } catch { /* storage unavailable: start empty */ }
-  }, []);
-  const sessionId = () => {
-    try {
-      let id = localStorage.getItem("ttc-sid");
-      if (!id) localStorage.setItem("ttc-sid", (id = crypto.randomUUID()));
-      return id;
-    } catch {
-      return crypto.randomUUID();
-    }
-  };
-  return {
-    get: (gameId: number) => votes[gameId],
-    cast(rec: Recommendation, v: Vote, query: string, lang: Locale) {
-      const next = votes[rec.game.id] === v ? 0 : v;
-      const updated = { ...votes };
-      if (next === 0) delete updated[rec.game.id];
-      else updated[rec.game.id] = next;
-      setVotes(updated);
-      try { localStorage.setItem("ttc-votes", JSON.stringify(updated)); } catch { /* ignore */ }
-      void sendFeedback({ sessionId: sessionId(), gameId: rec.game.id, vote: next, rank: rec.rank, score: rec.score, query, lang });
-    },
-  };
-}
-
-function FeedbackButtons({ t, vote, onVote }: { t: Dict; vote: Vote | undefined; onVote: (v: Vote) => void }) {
-  const btn = (v: Vote, label: string, path: string) => (
-    <button type="button" aria-pressed={vote === v} aria-label={label} title={label} onClick={() => onVote(v)}
-      className={`grid size-8 place-items-center rounded-lg border transition-colors ${
-        vote === v ? (v === 1 ? "border-felt bg-felt text-on-felt" : "border-meeple bg-meeple text-paper") : "border-line text-muted hover:text-ink"
-      }`}>
-      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden><path fill="currentColor" d={path} /></svg>
-    </button>
-  );
-  const up = "M2 21h4V9H2v12Zm20-11a2 2 0 0 0-2-2h-6.3l1-4.6v-.3a1.5 1.5 0 0 0-.4-1L13.2 1 6.6 7.6A2 2 0 0 0 6 9v10a2 2 0 0 0 2 2h9a2 2 0 0 0 1.8-1.2l3-7.1c.1-.2.2-.5.2-.7v-2Z";
-  const down = "M22 3h-4v12h4V3ZM2 14a2 2 0 0 0 2 2h6.3l-1 4.6v.3c0 .4.2.8.4 1l1.1 1.1 6.6-6.6A2 2 0 0 0 18 15V5a2 2 0 0 0-2-2H7a2 2 0 0 0-1.8 1.2l-3 7.1L2 12v2Z";
-  return (
-    <div className="mt-3 flex items-center gap-2 text-xs text-muted">
-      <span>{vote ? t.rec.feedbackThanks : t.rec.feedbackQ}</span>
-      {btn(1, t.rec.feedbackUp, up)}
-      {btn(-1, t.rec.feedbackDown, down)}
-    </div>
-  );
-}
-
 function ResultCard({ rec, catalog, t, lang, result, prefs, feedback }: Ctx & {
   rec: Recommendation; result: RecommendationResult; prefs: Preferences;
   feedback: { vote: Vote | undefined; onVote: (v: Vote) => void } | null;
@@ -555,34 +503,22 @@ function ResultCard({ rec, catalog, t, lang, result, prefs, feedback }: Ctx & {
   const v = g.values;
   const players = g.maxPlayers ? (g.maxPlayers === v.minPlayers ? `${v.minPlayers}` : `${v.minPlayers}–${g.maxPlayers}`) : `${v.minPlayers}+`;
   const top = rec.rank <= 3;
-  const num = (x: number | undefined, d: number) => x?.toLocaleString(t.intl, { minimumFractionDigits: d, maximumFractionDigits: d });
+  const nf = (x: number | undefined) => x?.toLocaleString(t.intl, { maximumFractionDigits: 1 });
   return (
-    <li className={`flex gap-4 rounded-2xl border bg-card p-4 ${top ? "border-felt/40" : "border-line"}`}>
-      <span className={`w-8 shrink-0 text-center font-display text-2xl font-semibold tabular ${top ? "text-felt" : "text-muted"}`}>{rec.rank}</span>
-      <Cover name={g.name} src={g.imageUrl} />
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-          <h3 className="font-display text-lg font-semibold leading-snug">
-            <Link href={gameHref(lang, g)} className="hover:underline">{g.name}</Link>
-          </h3>
-          <span className="text-sm tabular" title={t.rec.matchTitle}>
-            <span className="font-semibold">{pct}%</span> <span className="text-muted">{t.rec.match}</span>
-          </span>
-        </div>
-        <p className="text-xs text-muted">{genre} · {g.year}{g.bggRank ? ` · BGG #${g.bggRank}` : ""}</p>
-        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-sunken" aria-hidden>
-          <div className="h-full rounded-full bg-felt" style={{ width: `${pct}%` }} />
-        </div>
-        <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
-          <Stat label={t.rec.stat.players} value={players} />
-          <Stat label={t.rec.stat.time} value={`${v.playTime}m`} />
-          <Stat label={t.rec.stat.weight} value={`${num(v.complexity, 1)} / 5`} />
-          <Stat label={t.rec.stat.rating} value={`${num(v.rating, 1)}${g.votes ? ` (${compact(g.votes, t.intl)})` : ""}`} />
-          <Stat label={t.rec.stat.age} value={`${v.minAge}+`} />
-          {g.bestPlayers.length > 0 && <Stat label={t.rec.stat.best} value={g.bestPlayers.join(", ")} />}
-        </dl>
+    <li className="grid grid-cols-[28px_48px_minmax(0,1fr)] gap-x-3.5 border-t border-line/70 px-4 py-4 first:border-t-0 sm:grid-cols-[32px_48px_minmax(0,1fr)_minmax(96px,200px)] sm:px-5">
+      <span className="pt-3.5 font-mono text-[13px] text-muted tabular">{String(rec.rank).padStart(2, "0")}</span>
+      <Link href={gameHref(lang, g)} tabIndex={-1} aria-hidden className="block size-12 overflow-hidden rounded-xl"><Cover name={g.name} src={g.imageUrl} fillText={17} /></Link>
+      <div className="min-w-0">
+        <h3 className="font-display text-lg font-semibold leading-tight tracking-[-0.015em]">
+          <Link href={gameHref(lang, g)} className="hover:text-meeple">{g.name}</Link>
+        </h3>
+        <p className="mt-1 font-mono text-xs text-muted tabular">
+          {players} {t.catalog.playersUnit} · {v.playTime}′ · {nf(v.complexity)}/5 · {v.minAge}+ · ★ {nf(v.rating)}{g.votes ? ` (${compact(g.votes, t.intl)})` : ""}
+        </p>
+        <p className="mt-0.5 text-xs text-muted">{genre} · {g.year}{g.bggRank ? ` · BGG #${g.bggRank}` : ""}{g.bestPlayers.length ? ` · ${t.rec.stat.best} ${g.bestPlayers.join(", ")}` : ""}</p>
+        <div className="mt-2 sm:hidden"><MatchBar pct={pct} top={top} t={t} /></div>
         {reasons.length > 0 && (
-          <ul className="mt-3 flex flex-wrap gap-1.5 text-xs">
+          <ul className="mt-2.5 flex flex-wrap gap-1.5 text-xs">
             {reasons.map((r) => (
               <li key={r.key} className={`rounded-md px-2 py-1 text-ink ${r.tone === "good" ? "bg-felt-soft" : "bg-meeple-soft"}`}>
                 <span aria-hidden className={r.tone === "good" ? "text-felt" : "text-meeple"}>{r.tone === "good" ? "▲ " : "▼ "}</span>
@@ -601,15 +537,18 @@ function ResultCard({ rec, catalog, t, lang, result, prefs, feedback }: Ctx & {
         )}
         {feedback && <FeedbackButtons t={t} vote={feedback.vote} onVote={feedback.onVote} />}
       </div>
+      <div className="hidden sm:block sm:pt-3.5"><MatchBar pct={pct} top={top} t={t} /></div>
     </li>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function MatchBar({ pct, top, t }: { pct: number; top: boolean; t: Dict }) {
   return (
-    <div className="flex gap-1">
-      <dt>{label}</dt>
-      <dd className="font-medium text-ink tabular">{value}</dd>
+    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5" title={t.rec.matchTitle}>
+      <span aria-hidden className="block h-2 overflow-hidden rounded-full bg-sunken">
+        <span className={`block h-full rounded-full ${top ? "bg-meeple" : "bg-felt"}`} style={{ width: `${pct}%` }} />
+      </span>
+      <span className="min-w-[4ch] text-right font-mono text-sm font-semibold tabular">{pct}%<span className="sr-only"> {t.rec.match}</span></span>
     </div>
   );
 }

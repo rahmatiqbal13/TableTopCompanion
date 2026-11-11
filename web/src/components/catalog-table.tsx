@@ -8,82 +8,102 @@ import { gameHref } from "@/lib/i18n-paths";
 import type { Catalog, Game } from "@/lib/types";
 import { Cover } from "./cover";
 
-type SortKey = "name" | "year" | "rating" | "complexity" | "playTime" | "minAge" | "minPlayers";
-const COLUMNS: { key: SortKey; numeric?: boolean }[] = [
-  { key: "name" }, { key: "year", numeric: true }, { key: "rating", numeric: true }, { key: "complexity", numeric: true },
-  { key: "playTime", numeric: true }, { key: "minPlayers", numeric: true }, { key: "minAge", numeric: true },
-];
+type SortKey = "rating" | "light" | "quick" | "name";
+const SORTS: SortKey[] = ["rating", "light", "quick", "name"];
+/** 0 = any; 5 means "5 or more". */
+const PLAYERS = [0, 2, 3, 4, 5];
 
-const valueOf = (g: Game, k: SortKey) => (k === "name" ? g.name : k === "year" ? g.year : g.values[k]);
+const fitsPlayers = (g: Game, n: number) => {
+  if (!n) return true;
+  const min = g.values.minPlayers ?? 1, max = g.maxPlayers ?? Infinity;
+  return n === 5 ? max >= 5 : min <= n && n <= max;
+};
 
+const compare: Record<SortKey, (a: Game, b: Game) => number> = {
+  rating: (a, b) => (b.values.rating ?? 0) - (a.values.rating ?? 0),
+  light: (a, b) => (a.values.complexity ?? 9) - (b.values.complexity ?? 9),
+  quick: (a, b) => (a.values.playTime ?? 999) - (b.values.playTime ?? 999),
+  name: (a, b) => a.name.localeCompare(b.name),
+};
+
+const chip = (on: boolean) =>
+  `min-h-10 cursor-pointer rounded-full border px-3.5 text-sm transition-colors active:scale-[0.96] ${
+    on ? "border-ink bg-ink text-paper" : "border-line bg-card text-ink hover:border-muted"
+  }`;
+
+/** The public catalogue: search, player-count and sort chips over a card grid. */
 export function CatalogTable({ catalog, t, lang }: { catalog: Catalog; t: Dict; lang: Locale }) {
   const [q, setQ] = useState("");
-  const [genre, setGenre] = useState<number | "all">("all");
-  const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: "rating", dir: -1 });
+  const [players, setPlayers] = useState(0);
+  const [sort, setSort] = useState<SortKey>("rating");
   const genres = new Map(catalog.genres.map((g) => [g.id, genreName(t, g)]));
-  const num = (x: number | undefined) => x?.toLocaleString(t.intl, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const nf = (x: number | undefined, d = 1) => x?.toLocaleString(t.intl, { maximumFractionDigits: d }) ?? "–";
 
   const rows = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return catalog.games
-      .filter((g) => (genre === "all" || g.genreId === genre) && (!needle || g.name.toLowerCase().includes(needle)
+      .filter((g) => fitsPlayers(g, players) && (!needle || g.name.toLowerCase().includes(needle)
         || g.mechanics.some((m) => m.toLowerCase().includes(needle))))
-      .sort((a, b) => {
-        const x = valueOf(a, sort.key), y = valueOf(b, sort.key);
-        return (typeof x === "string" ? x.localeCompare(String(y)) : (x ?? 0) - (Number(y) || 0)) * sort.dir;
-      });
-  }, [catalog.games, q, genre, sort]);
+      .sort(compare[sort]);
+  }, [catalog.games, q, players, sort]);
 
   return (
-    <div className="mt-6 space-y-3">
-      <div className="flex flex-wrap gap-2">
-        <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t.catalog.search}
-          aria-label={t.catalog.search} className="min-w-0 flex-1 rounded-lg border border-line bg-card px-3 py-2 text-sm sm:max-w-xs" />
-        <select value={genre} onChange={(e) => setGenre(e.target.value === "all" ? "all" : Number(e.target.value))}
-          aria-label={t.rec.genres} className="rounded-lg border border-line bg-card px-3 py-2 text-sm">
-          <option value="all">{t.catalog.allGenres}</option>
-          {catalog.genres.map((g) => <option key={g.id} value={g.id}>{genres.get(g.id)}</option>)}
-        </select>
-        <span className="self-center text-sm text-muted">{fmt(t.catalog.shown, { n: rows.length })}</span>
+    <div>
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+        <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t.catalog.search} aria-label={t.catalog.search}
+          className="min-h-11 min-w-0 flex-[1_1_260px] rounded-full border border-line bg-card px-[18px] text-[15px]" />
+        <div role="group" aria-label={t.catalog.col.minPlayers} className="flex flex-wrap items-center gap-1.5">
+          <span className="mr-1 text-[13px] text-muted">{t.catalog.col.minPlayers}</span>
+          {PLAYERS.map((n) => (
+            <button key={n} type="button" aria-pressed={players === n} onClick={() => setPlayers(n)} className={`${chip(players === n)} font-mono text-[13px]`}>
+              {n === 0 ? t.catalog.all : n === 5 ? "5+" : n}
+            </button>
+          ))}
+        </div>
       </div>
-      <div className="overflow-x-auto rounded-2xl border border-line bg-card">
-        <table className="w-full text-sm">
-          <thead className="border-b border-line text-left text-xs text-muted">
-            <tr>
-              {COLUMNS.map((c) => (
-                <th key={c.key} className={`px-3 py-2 font-medium ${c.numeric ? "text-right" : ""}`}
-                  aria-sort={sort.key === c.key ? (sort.dir === 1 ? "ascending" : "descending") : "none"}>
-                  <button type="button" className="hover:text-ink"
-                    onClick={() => setSort((s) => ({ key: c.key, dir: s.key === c.key ? (s.dir === 1 ? -1 : 1) : c.numeric ? -1 : 1 }))}>
-                    {t.catalog.col[c.key]}{sort.key === c.key ? (sort.dir === 1 ? " ↑" : " ↓") : ""}
-                  </button>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-line tabular">
-            {rows.map((g) => (
-              <tr key={g.id} className="hover:bg-sunken/50">
-                <td className="px-3 py-2">
-                  <div className="flex items-center gap-3">
-                    <Cover name={g.name} src={g.imageUrl} size={36} />
-                    <div className="min-w-0">
-                      <Link href={gameHref(lang, g)} className="font-medium hover:underline">{g.name}</Link>
-                      <div className="text-xs text-muted">{genres.get(g.genreId)}</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-3 py-2 text-right">{g.year}</td>
-                <td className="px-3 py-2 text-right">{num(g.values.rating)}</td>
-                <td className="px-3 py-2 text-right">{num(g.values.complexity)}</td>
-                <td className="px-3 py-2 text-right">{g.values.playTime}m</td>
-                <td className="px-3 py-2 text-right">{g.maxPlayers ? `${g.values.minPlayers}–${g.maxPlayers}` : `${g.values.minPlayers}+`}</td>
-                <td className="px-3 py-2 text-right">{g.values.minAge}+</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="mb-7 mt-3.5 flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
+        <p className="font-mono text-[13px] text-muted">{fmt(t.catalog.count, { n: rows.length })}</p>
+        <div role="group" aria-label={t.catalog.sort} className="flex flex-wrap items-center gap-1.5">
+          <span className="mr-1 text-[13px] text-muted">{t.catalog.sort}</span>
+          {SORTS.map((k) => (
+            <button key={k} type="button" aria-pressed={sort === k} onClick={() => setSort(k)} className={chip(sort === k)}>{t.catalog.sorts[k]}</button>
+          ))}
+        </div>
       </div>
+
+      {rows.length ? (
+        <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,230px),1fr))] gap-[22px]">
+          {rows.map((g) => (
+            <li key={g.id}>
+              <Link href={gameHref(lang, g)}
+                className="block h-full rounded-[18px] border border-line bg-card p-2.5 text-ink transition-[transform,box-shadow] duration-[220ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-1 hover:shadow-[0_18px_30px_-18px_rgba(31,27,22,0.45)]">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
+                  <Cover name={g.name} src={g.imageUrl} fillText={56} />
+                  {g.values.rating != null && (
+                    <span className="tabular absolute right-2.5 top-2.5 rounded-full bg-table-gold px-2.5 py-1 font-mono text-xs font-semibold text-table-ink">
+                      {nf(g.values.rating)}
+                    </span>
+                  )}
+                </div>
+                <div className="px-1.5 pb-1.5 pt-3">
+                  <h2 className="font-display text-[19px] font-bold leading-tight tracking-[-0.02em]">{g.name}</h2>
+                  <p className="mt-1 text-xs text-muted">{genres.get(g.genreId)} · {g.year}</p>
+                  <p className="tabular mt-1.5 font-mono text-xs text-muted">
+                    {g.maxPlayers && g.maxPlayers !== g.values.minPlayers ? `${g.values.minPlayers}–${g.maxPlayers}` : `${g.values.minPlayers}${g.maxPlayers ? "" : "+"}`} {t.catalog.playersUnit}
+                    {" · "}{g.values.playTime}′ · {nf(g.values.complexity)}/5 · {g.values.minAge}+
+                  </p>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="rounded-[22px] border border-dashed border-muted/60 px-6 py-12 text-center">
+          <p className="font-display text-2xl font-semibold">{t.catalog.none}</p>
+          <button type="button" onClick={() => { setQ(""); setPlayers(0); }}
+            className="mt-4 min-h-11 cursor-pointer rounded-full bg-ink px-5 font-semibold text-paper">{t.catalog.clear}</button>
+        </div>
+      )}
     </div>
   );
 }

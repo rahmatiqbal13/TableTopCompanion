@@ -43,9 +43,11 @@ export function AuthMenu({ lang, labels: l }: { lang: Locale; labels: AuthMenuLa
   }
   const initial = (account.name ?? account.email ?? "?").trim().charAt(0).toUpperCase();
   const quick = "hidden rounded-full px-2.5 py-1.5 text-xs font-medium text-on-table-muted hover:bg-on-table/10 hover:text-on-table sm:block";
+  const onMe = path === href(lang, "/me");
   return (
     <>
-    <Link href={href(lang, "/me")} className={quick}>{l.myGames}</Link>
+    <Link href={href(lang, "/me")} aria-current={onMe ? "page" : undefined}
+      className={onMe ? "hidden rounded-full bg-on-table px-2.5 py-1.5 text-xs font-medium text-table-ink sm:block" : quick}>{l.myGames}</Link>
     {account.role !== "user" && (
       // The admin area has its own root layout, so a full page load is needed anyway.
       // eslint-disable-next-line @next/next/no-html-link-for-pages

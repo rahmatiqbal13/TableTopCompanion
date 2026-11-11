@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { PageHero } from "@/components/ui";
 import { CatalogTable } from "@/components/catalog-table";
 import { fmt, getDict, hasLocale } from "@/i18n";
 import { getCatalog } from "@/lib/data";
@@ -17,13 +18,15 @@ export default async function GamesPage({ params }: PageProps<"/[lang]/games">) 
   const t = getDict(lang);
   const catalog = await getCatalog();
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
-      <h1 className="font-display text-3xl font-semibold tracking-tight">{t.catalog.title}</h1>
-      <p className="mt-1 text-sm text-muted">
-        {fmt(t.catalog.count, { n: catalog.games.length })}
-        {catalog.updatedAt && ` · ${fmt(t.catalog.updated, { date: formatDate(t, catalog.updatedAt) })}`}
-      </p>
+    <>
+    <PageHero kicker={t.heroes.games.kicker} title={t.heroes.games.title} sub={t.heroes.games.sub}>
+      {catalog.updatedAt && (
+        <p className="mt-5 font-mono text-[13px] text-on-table-muted">{fmt(t.catalog.updated, { date: formatDate(t, catalog.updatedAt) })}</p>
+      )}
+    </PageHero>
+    <div className="mx-auto max-w-6xl px-4 pb-24 pt-12">
       <CatalogTable catalog={{ ...catalog, games: catalog.games.map((g) => ({ ...g, description: null })) }} t={t} lang={lang} />
     </div>
+    </>
   );
 }

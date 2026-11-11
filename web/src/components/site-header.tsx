@@ -4,6 +4,7 @@ import { href } from "@/lib/i18n-paths";
 import { authConfigured } from "@/lib/supabase/config";
 import { AuthMenu } from "./auth-menu";
 import { LanguageSwitch } from "./language-switch";
+import { SiteNav } from "./site-nav";
 
 export function SiteHeader({ lang, t }: { lang: Locale; t: Dict }) {
   const nav = [
@@ -23,17 +24,7 @@ export function SiteHeader({ lang, t }: { lang: Locale; t: Dict }) {
           <span className="block rounded-lg bg-on-table px-2.5 pb-1 pt-[3px] font-display text-[19px] font-extrabold leading-none tracking-[-0.04em] text-table">TableTop</span>
           <span className="mt-1 block pl-[0.42em] font-mono text-[9px] font-semibold uppercase tracking-[0.42em] text-table-gold">Companion</span>
         </Link>
-        <nav aria-label={t.nav.menu} className="order-last -mx-1 w-full overflow-x-auto [scrollbar-width:none] md:order-none md:mx-0 md:ml-auto md:w-auto">
-          <ul className="flex gap-0.5 text-sm">
-            {nav.map((n) => (
-              <li key={n.path}>
-                <Link href={href(lang, n.path)} className="block whitespace-nowrap rounded-full px-3 py-2 text-on-table-muted transition-colors hover:bg-on-table/10 hover:text-on-table">
-                  {n.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <SiteNav lang={lang} label={t.nav.menu} items={nav} />
         <div className="ml-auto flex items-center gap-2 md:ml-0">
           <LanguageSwitch from={lang} to={other} label={t.nav.switchLabel} />
           {authConfigured && (

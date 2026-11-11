@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PageHero } from "@/components/ui";
 import { fmt, getDict, hasLocale, locales } from "@/i18n";
 import { getPublishedListings } from "@/lib/data";
 import { href } from "@/lib/i18n-paths";
@@ -19,10 +20,10 @@ export default async function LocalHub({ params }: PageProps<"/[lang]/local">) {
   const t = getDict(lang);
   const listings = await getPublishedListings();
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-20 pt-10">
-      <h1 className="font-display text-4xl font-semibold tracking-tight">{t.local.title}</h1>
-      <p className="mt-2 max-w-2xl text-muted">{t.local.intro}</p>
-      <div className="mt-8 grid gap-6 md:grid-cols-3">
+    <>
+    <PageHero kicker={t.heroes.local.kicker} title={t.heroes.local.title} sub={t.local.intro} />
+    <div className="mx-auto max-w-6xl px-4 pb-20 pt-12">
+      <div className="grid gap-6 md:grid-cols-3">
         {LOCAL_KINDS.map((kind) => {
           const n = listings.filter((l) => l.kind === kind).length;
           return (
@@ -35,5 +36,6 @@ export default async function LocalHub({ params }: PageProps<"/[lang]/local">) {
         })}
       </div>
     </div>
+    </>
   );
 }

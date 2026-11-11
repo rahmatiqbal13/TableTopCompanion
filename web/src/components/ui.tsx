@@ -57,3 +57,20 @@ export function PageSkeleton() {
     </div>
   );
 }
+
+/** The felt band under the header that opens every sub-page, so the table carries on from the header. */
+export function PageHero({ kicker, title, sub, children, width = "max-w-6xl" }: {
+  kicker: string; title: React.ReactNode; sub?: React.ReactNode; children?: React.ReactNode; width?: string;
+}) {
+  return (
+    <section className="table-surface relative overflow-hidden text-on-table">
+      <div aria-hidden className="table-vignette pointer-events-none absolute inset-0" />
+      <div className={`relative mx-auto ${width} px-4 pb-12 pt-9 sm:pb-14 sm:pt-11`}>
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-table-gold">{kicker}</p>
+        <h1 className="mt-3.5 max-w-[760px] text-balance font-display text-[clamp(40px,6vw,76px)] font-bold leading-[0.95] tracking-[-0.045em]">{title}</h1>
+        {sub && <p className="mt-4 max-w-[560px] text-pretty text-lg leading-relaxed text-on-table-muted">{sub}</p>}
+        {children}
+      </div>
+    </section>
+  );
+}

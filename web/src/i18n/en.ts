@@ -36,6 +36,7 @@ export const en = {
     },
   },
   rec: {
+    allTitle: "All results", finer: "Fine-tune", filters: "Filter",
     title: "Find a game",
     subtitle: "Set tonight's constraints and what matters. Results update instantly and the link is shareable.",
     seeResults: "See {n} results ↓",
@@ -135,7 +136,9 @@ export const en = {
   } as Record<string, string>,
   catalog: {
     title: "Games", count: "{n} games", updated: "updated {date}",
-    search: "Search name or mechanic", allGenres: "All genres", shown: "{n} shown",
+    search: "Search games…", allGenres: "All genres", shown: "{n} shown", all: "All", playersUnit: "players",
+    sort: "Sort", sorts: { rating: "Rating", light: "Lightest", quick: "Quickest", name: "Name" },
+    none: "No games match these filters.", clear: "Clear filters",
     col: { name: "Game", year: "Year", rating: "Rating", complexity: "Weight", playTime: "Time", minPlayers: "Players", minAge: "Age" },
   },
   game: {
@@ -147,6 +150,19 @@ export const en = {
     videos: "Videos", related: "Articles about this game", similar: "If you like this, try",
     findSimilar: "Find similar games", viewBgg: "View on BoardGameGeek",
     noContent: "No reviews or videos for this game yet.",
+  },
+  heroes: {
+    recommend: { kicker: "Recommend", title: "What are we playing tonight?", sub: "Set the players, time and taste. Every result comes with its reasons and the math." },
+    games: { kicker: "Catalogue", title: "Every game on our shelf.", sub: "Search by name, filter by player count, or sort to taste. Data from BoardGameGeek." },
+    reviews: { kicker: "Reviews", title: "Honest about who will love it.", sub: "Every review says who the game suits, when to skip it, and where our copy came from." },
+    videos: { kicker: "Videos", title: "Learn to play without the rulebook.", sub: "Quick how-tos, full playthroughs and video reviews." },
+    news: { kicker: "News", title: "What's new at TableTop Companion.", sub: "New features, catalogue additions and community updates." },
+    guides: { kicker: "Guides", title: "Play smoother, teach easier.", sub: "Short guides to using the recommender, teaching games and choosing what's next." },
+    local: { kicker: "Play near you", title: "Find a table and new people to play with.", sub: "Board game cafés, city communities and games made in Indonesia." },
+    method: { kicker: "How it works", title: "Every pick comes with its reasons.", sub: "Hybrid TOPSIS, step by step." },
+    login: { kicker: "Your account", title: "Sign in" },
+    me: { kicker: "Your account", title: "My games" },
+    latest: "Latest", readMin: "{n} min read",
   },
   posts: {
     types: {

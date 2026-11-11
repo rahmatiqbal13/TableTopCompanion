@@ -38,6 +38,7 @@ export const id: Dict = {
     },
   },
   rec: {
+    allTitle: "Semua hasil", finer: "Atur lebih lanjut", filters: "Saring",
     title: "Cari game",
     subtitle: "Atur kondisi malam ini dan apa yang penting. Hasil langsung berubah dan tautannya bisa dibagikan.",
     seeResults: "Lihat {n} hasil ↓",
@@ -141,7 +142,9 @@ export const id: Dict = {
   },
   catalog: {
     title: "Game", count: "{n} game", updated: "diperbarui {date}",
-    search: "Cari nama atau mekanik", allGenres: "Semua genre", shown: "{n} ditampilkan",
+    search: "Cari game…", allGenres: "Semua genre", shown: "{n} ditampilkan", all: "Semua", playersUnit: "pemain",
+    sort: "Urutkan", sorts: { rating: "Rating", light: "Paling ringan", quick: "Paling cepat", name: "Nama" },
+    none: "Tidak ada game yang cocok dengan filter ini.", clear: "Hapus filter",
     col: { name: "Game", year: "Tahun", rating: "Rating", complexity: "Bobot", playTime: "Durasi", minPlayers: "Pemain", minAge: "Usia" },
   },
   game: {
@@ -153,6 +156,19 @@ export const id: Dict = {
     videos: "Video", related: "Artikel tentang game ini", similar: "Kalau suka ini, coba juga",
     findSimilar: "Cari game serupa", viewBgg: "Lihat di BoardGameGeek",
     noContent: "Belum ada ulasan atau video untuk game ini.",
+  },
+  heroes: {
+    recommend: { kicker: "Rekomendasi", title: "Malam ini main apa?", sub: "Atur pemain, waktu, dan selera. Setiap hasil datang dengan alasan dan perhitungannya." },
+    games: { kicker: "Katalog", title: "Semua game di rak kami.", sub: "Cari berdasarkan nama, jumlah pemain, atau urutkan sesuai seleramu. Data dari BoardGameGeek." },
+    reviews: { kicker: "Ulasan", title: "Jujur soal siapa yang akan suka.", sub: "Setiap ulasan menyebut untuk siapa game itu cocok, kapan sebaiknya dilewati, dan dari mana salinannya." },
+    videos: { kicker: "Video", title: "Belajar main tanpa buka buku aturan.", sub: "Cara main singkat, playthrough lengkap, dan ulasan video." },
+    news: { kicker: "Berita", title: "Yang baru di TableTop Companion.", sub: "Fitur baru, tambahan katalog, dan kabar komunitas." },
+    guides: { kicker: "Panduan", title: "Main lebih lancar, ajarkan lebih mudah.", sub: "Panduan singkat untuk memakai rekomendasi, mengajarkan game, dan memilih game baru." },
+    local: { kicker: "Main di sekitarmu", title: "Ketemu meja dan teman main baru.", sub: "Kafe board game, komunitas kota, dan game buatan Indonesia." },
+    method: { kicker: "Cara kerja", title: "Setiap rekomendasi ada alasannya.", sub: "TOPSIS hibrida, langkah demi langkah." },
+    login: { kicker: "Akunmu", title: "Masuk" },
+    me: { kicker: "Akunmu", title: "Game saya" },
+    latest: "Terbaru", readMin: "{n} mnt baca",
   },
   posts: {
     types: {

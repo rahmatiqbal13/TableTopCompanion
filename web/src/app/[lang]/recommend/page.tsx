@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { MethodBox } from "@/components/method-box";
 import { Suspense } from "react";
 import { Recommender } from "@/components/recommender";
 import { getDict, hasLocale } from "@/i18n";
@@ -22,13 +23,10 @@ export default async function RecommendPage({ params }: PageProps<"/[lang]/recom
   const catalog: Catalog = { ...full, games: full.games.map((g) => ({ ...g, description: null })) };
   return (
     <>
-      <section className="mx-auto max-w-6xl px-4 pb-6 pt-10">
-        <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">{t.rec.title}</h1>
-        <p className="mt-2 max-w-2xl text-muted">{t.rec.subtitle}</p>
-      </section>
-      <Suspense fallback={<div className="mx-auto h-96 max-w-6xl animate-pulse rounded-2xl bg-sunken" />}>
+      <Suspense fallback={<div className="table-surface h-[640px]" />}>
         <Recommender catalog={catalog} t={t} lang={lang} />
       </Suspense>
+      <MethodBox t={t} lang={lang} />
     </>
   );
 }

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { PageSkeleton } from "@/components/ui";
-import { GameCard, PostCard, ReviewVerdict, ShortsRail } from "@/components/cards";
+import { PageHero, PageSkeleton } from "@/components/ui";
+import { GameCard, GuideRow, NewsList, PostCard, ReviewCard, ReviewVerdict, ShortsRail } from "@/components/cards";
 import { Markdown } from "@/components/markdown";
 import { VideoPlayer } from "@/components/video-player";
 import { fmt, getDict, hasLocale, locales } from "@/i18n";
@@ -29,27 +29,37 @@ export function listing(type: PostType) {
     const { lang } = await params;
     if (!hasLocale(lang)) notFound();
     const t = getDict(lang);
-    const all = (await getPublishedPosts()).filter((p) => p.type === type);
+    const [posts0, catalog] = await Promise.all([getPublishedPosts(), getCatalog()]);
+    const all = posts0.filter((p) => p.type === type);
+    const names = new Map(catalog.games.map((g) => [g.id, g.name]));
+    const gameOf = (p: (typeof all)[number]) => names.get(p.gameIds[0]);
     const shorts = type === "videos" ? all.filter((p) => p.videoFormat === "short") : [];
-    const [lead, ...rest] = all.filter((p) => !shorts.includes(p));
+    const posts = all.filter((p) => !shorts.includes(p));
+    const h = t.heroes[type];
     return (
-      <div className="mx-auto max-w-6xl px-4 pb-20 pt-10">
-        <h1 className="font-display text-4xl font-semibold tracking-tight">{t.posts.types[type].title}</h1>
-        <p className="mt-2 max-w-2xl text-muted">{t.posts.types[type].intro}</p>
-        {shorts.length > 0 && <div className="mt-8"><ShortsRail posts={shorts} lang={lang} t={t} /></div>}
-        {!lead && !shorts.length ? (
-          <p className="mt-10 rounded-2xl border border-dashed border-line p-10 text-center text-muted">{t.posts.empty}</p>
-        ) : lead && (
-          <>
-            <div className="mt-8 max-w-3xl"><PostCard post={lead} lang={lang} t={t} size="lg" /></div>
-            {rest.length > 0 && (
-              <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                {rest.map((p) => <PostCard key={p.id} post={p} lang={lang} t={t} />)}
-              </div>
-            )}
-          </>
-        )}
-      </div>
+      <>
+        <PageHero kicker={h.kicker} title={h.title} sub={h.sub} />
+        <div className="mx-auto max-w-6xl px-4 pb-24 pt-12">
+          {shorts.length > 0 && <div className="mb-12"><ShortsRail posts={shorts} lang={lang} t={t} /></div>}
+          {!posts.length && !shorts.length ? (
+            <p className="rounded-2xl border border-dashed border-line p-10 text-center text-muted">{t.posts.empty}</p>
+          ) : type === "reviews" ? (
+            <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+              {posts.map((p) => <ReviewCard key={p.id} post={p} lang={lang} t={t} game={gameOf(p)} />)}
+            </div>
+          ) : type === "news" ? (
+            <NewsList posts={posts} lang={lang} t={t} />
+          ) : type === "guides" ? (
+            <div className="grid border-t-2 border-ink md:grid-cols-2 md:gap-x-12">
+              {posts.map((p, i) => <GuideRow key={p.id} post={p} n={i + 1} lang={lang} t={t} />)}
+            </div>
+          ) : (
+            <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+              {posts.map((p) => <PostCard key={p.id} post={p} lang={lang} t={t} game={gameOf(p)} />)}
+            </div>
+          )}
+        </div>
+      </>
     );
   }
   return { Page, generateMetadata };
