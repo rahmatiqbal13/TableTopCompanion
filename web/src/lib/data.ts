@@ -22,7 +22,7 @@ export async function getCatalog(): Promise<Catalog> {
   }
   const d = db();
   const ug = schema.userGames, pr = schema.profiles;
-  const [genres, criteria, games, community] = await Promise.all([
+  const [genres, criteria, games, community, presets] = await Promise.all([
     d.select().from(schema.genres).orderBy(asc(schema.genres.name)),
     d.select().from(schema.criteria).orderBy(asc(schema.criteria.sort), asc(schema.criteria.id)),
     d.select().from(schema.games).orderBy(desc(schema.games.updatedAt)),
@@ -30,12 +30,14 @@ export async function getCatalog(): Promise<Catalog> {
       .from(ug).innerJoin(pr, eq(pr.id, ug.userId))
       .where(and(sql`${ug.rating} is not null`, eq(pr.banned, false)))
       .groupBy(ug.gameId),
+    d.select().from(schema.presetWeights),
   ]);
   const byGame = new Map(community.map((c) => [c.gameId, { rating: c.rating, votes: c.votes }]));
   return {
     genres,
     criteria,
     games: games.map(({ updatedAt: _u, ...g }) => ({ ...g, community: byGame.get(g.id) ?? null })),
+    presetWeights: Object.fromEntries(presets.map((p) => [p.presetId, p.weights])),
     live: true,
     updatedAt: games[0]?.updatedAt.toISOString() ?? null,
   };
@@ -162,10 +164,11 @@ export async function getUsersForAdmin(): Promise<AdminUser[]> {
 }
 
 export interface AdminOverview {
-  games: { total: number; noImage: number; noBgg: number };
-  posts: { published: number; drafts: { id: number; title: string; type: string; updatedAt: string }[] };
+  games: { total: number; noImage: number; noBgg: number; noText: number };
+  posts: { published: number; draftCount: number };
+  listings: { drafts: number };
   users: { total: number; newThisWeek: number; ratings: number };
-  feedback: { total: number; thisWeek: number; up: number };
+  feedback: { total: number; thisWeek: number; up: number; flagged: number; topGames: { name: string; votes: number }[] };
 }
 
 /** Numbers and to-dos for the admin dashboard. Not cached. */
@@ -174,15 +177,20 @@ export async function getAdminOverview(): Promise<AdminOverview | null> {
   const d = db();
   const g = schema.games, p = schema.posts, pr = schema.profiles, ug = schema.userGames, f = schema.feedback;
   const week = sql`now() - interval '7 days'`;
-  const [[games], [posts], drafts, [users], [ratings], [feedback]] = await Promise.all([
+  const votesByGame = d.select({ gameId: f.gameId, up: sql<number>`count(*) filter (where ${f.vote} = 1)::int`.as("up"), down: sql<number>`count(*) filter (where ${f.vote} = -1)::int`.as("down") })
+    .from(f).groupBy(f.gameId).as("votes_by_game");
+  const [[games], [posts], [listings], [users], [ratings], [feedback], [flagged], topGames] = await Promise.all([
     d.select({
       total: sql<number>`count(*)::int`,
       noImage: sql<number>`count(*) filter (where ${g.imageUrl} is null)::int`,
       noBgg: sql<number>`count(*) filter (where ${g.bggId} is null)::int`,
+      noText: sql<number>`count(*) filter (where coalesce(${g.description}, '') = '')::int`,
     }).from(g),
-    d.select({ published: sql<number>`count(*) filter (where ${p.status} = 'published')::int` }).from(p),
-    d.select({ id: p.id, text: p.text, type: p.type, updatedAt: p.updatedAt }).from(p)
-      .where(eq(p.status, "draft")).orderBy(desc(p.updatedAt)).limit(5),
+    d.select({
+      published: sql<number>`count(*) filter (where ${p.status} = 'published')::int`,
+      draftCount: sql<number>`count(*) filter (where ${p.status} = 'draft')::int`,
+    }).from(p),
+    d.select({ drafts: sql<number>`count(*) filter (where ${schema.localListings.status} = 'draft')::int` }).from(schema.localListings),
     d.select({ total: sql<number>`count(*)::int`, newThisWeek: sql<number>`count(*) filter (where ${pr.createdAt} > ${week})::int` }).from(pr),
     d.select({ n: sql<number>`count(${ug.rating})::int` }).from(ug),
     d.select({
@@ -190,14 +198,9 @@ export async function getAdminOverview(): Promise<AdminOverview | null> {
       thisWeek: sql<number>`count(*) filter (where ${f.createdAt} > ${week})::int`,
       up: sql<number>`count(*) filter (where ${f.vote} = 1)::int`,
     }).from(f),
+    d.select({ n: sql<number>`count(*)::int` }).from(votesByGame).where(sql`${votesByGame.down} > ${votesByGame.up}`),
+    d.select({ name: g.name, votes: sql<number>`count(*)::int` }).from(f).innerJoin(g, eq(f.gameId, g.id))
+      .where(sql`${f.createdAt} > ${week}`).groupBy(g.id, g.name).orderBy(sql`count(*) desc`).limit(5),
   ]);
-  return {
-    games,
-    posts: {
-      published: posts.published,
-      drafts: drafts.map((r) => ({ id: r.id, type: r.type, title: r.text.id?.title || r.text.en?.title || "(untitled)", updatedAt: r.updatedAt.toISOString() })),
-    },
-    users: { ...users, ratings: ratings.n },
-    feedback,
-  };
+  return { games, posts, listings, users: { ...users, ratings: ratings.n }, feedback: { ...feedback, flagged: flagged.n, topGames } };
 }

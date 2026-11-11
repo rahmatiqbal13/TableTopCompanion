@@ -164,7 +164,7 @@ function PriorityPanel({ catalog, t, lang, prefs, setPrefs, setCriterion, update
       action={<button type="button" onClick={() => setPrefs(defaultPreferences(catalog))} className="text-xs text-muted underline">{t.rec.resetAll}</button>}>
       <div className="flex flex-wrap gap-1.5">
         {PRESETS.map((p) => {
-          const values = p.criteria(catalog.criteria);
+          const values = p.criteria(catalog.criteria, catalog.presetWeights?.[p.id]);
           // Presets leave the derived criteria at the user's current setting.
           for (const d of DERIVED) values[d.key] = prefs.criteria[d.key];
           const label = t.presets[p.id] ?? { label: p.label, description: p.description };

@@ -6,7 +6,7 @@ Next.js 16 app, bilingual (`/id`, `/en`), Postgres on Supabase, deployable to Ve
 - **Games** `/[lang]/games` and a hub page per game (stats, your review, videos, related posts, similar games)
 - **Content** `/[lang]/reviews`, `/videos`, `/news`, `/guides`: written by you in the admin, Markdown, YouTube and TikTok embeds
 - **Play near you** `/[lang]/local`: cafés, communities and Indonesian-made games, managed in `/admin/local`
-- **Admin** `/admin`: posts, near-you listings, games, criteria, genres
+- **Admin** `/admin`: posts, near-you listings, games, criteria, genres, recommender weights per mood (`/admin/recommend`)
 - `sitemap.xml` with language alternates, `robots.txt`
 
 Visitors are sent to their language by a saved choice, then their browser language, then Indonesian.
@@ -90,11 +90,11 @@ The site caches data, so make Supabase tell it about changes, once:
 **Supabase → Database → Webhooks → Create** for each of `games`, `genres`, `criteria`, `posts`, `profiles`:
 events Insert/Update/Delete, type HTTP Request, method POST,
 URL `https://<your-domain>/api/revalidate`, header `x-revalidate-secret: <REVALIDATE_SECRET>`.
-Without webhooks, press **↻ Refresh site data** in `/admin` after editing (or wait up to an hour).
+Without webhooks, press **↻ Muat ulang data situs** in `/admin` after editing (or wait up to an hour).
 
 ## Writing content
 
-`/admin/posts` → **New post**. Each post has a type (news, review, video, guide), a status (draft/published),
+`/admin/posts` → **Tulis baru**. Each post has a type (news, review, video, guide), a status (draft/published),
 text in Bahasa Indonesia and/or English (a missing language falls back to the other with a note),
 an optional YouTube or TikTok link (required for videos), and linked games, which makes the post appear on those
 games' pages. A video link on its own line in the body becomes an embedded player.
@@ -104,7 +104,7 @@ games' pages. A video link on its own line in the body becomes an embedded playe
 - **Reviews** also take a score, sub-scores (easy to teach, interaction, replay), how the copy was obtained, and
   "Great for" / "Skip if" per language. Without sub-scores the score sheet shows the game's own numbers.
 
-`/admin/local` → **New listing** adds a café, community or Indonesian-made game to "Play near you". The home page
+`/admin/local` → **Listing baru** adds a café, community or Indonesian-made game to "Play near you". The home page
 only shows that section once something is published.
 
 ## More game data (BoardGameGeek)

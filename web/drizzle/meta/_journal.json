@@ -43,6 +43,13 @@
       "when": 1794220146510,
       "tag": "0005_video_review_local",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794223278921,
+      "tag": "0006_admin_redesign",
+      "breakpoints": true
     }
   ]
 }

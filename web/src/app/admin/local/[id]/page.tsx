@@ -1,20 +1,19 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { FreshAfterSubmit } from "@/components/admin-fresh-form";
+import { AdminHeader } from "@/components/admin-shell";
 import { AdminSignIn } from "@/components/admin-signin";
+import { panel } from "@/components/admin-ui";
 import { LocalEditor } from "@/components/local-editor";
 import { canEdit } from "@/lib/auth";
 import { getAllListingsForAdmin, getCatalog } from "@/lib/data";
 
 export default function EditListingPage({ params }: PageProps<"/admin/local/[id]">) {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10">
-      <Link href="/admin/local" className="text-sm text-muted underline">← Near you</Link>
-      <Suspense fallback={<p className="mt-4 text-muted">Loading…</p>}>
-        <Editor params={params} />
-      </Suspense>
-    </div>
+    <Suspense fallback={<p className="text-muted">Memuat…</p>}>
+      <Editor params={params} />
+    </Suspense>
   );
 }
 
@@ -28,11 +27,9 @@ async function Editor({ params }: { params: Promise<{ id: string }> }) {
   const games = catalog.games.map(({ id, name }) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
   return (
     <>
-      <h1 className="mb-6 mt-2 font-display text-3xl font-semibold tracking-tight">{listing ? "Edit listing" : "New listing"}</h1>
-      {!catalog.live && (
-        <p className="mb-6 rounded-xl border border-gold/40 bg-card p-4 text-sm">Read-only: connect a database (DATABASE_URL) to save listings.</p>
-      )}
-      <LocalEditor listing={listing ?? null} games={games} canUpload={Boolean(process.env.BLOB_READ_WRITE_TOKEN)} />
+      <AdminHeader kicker="Listing lokal" title={listing ? listing.name : "Listing baru"} />
+      {!catalog.live && <p className={`${panel} mb-6 p-4 text-sm`}>Hanya baca: hubungkan database (DATABASE_URL) untuk menyimpan listing.</p>}
+      <FreshAfterSubmit><LocalEditor listing={listing ?? null} games={games} canUpload={Boolean(process.env.BLOB_READ_WRITE_TOKEN)} /></FreshAfterSubmit>
     </>
   );
 }

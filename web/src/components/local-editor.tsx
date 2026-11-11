@@ -4,12 +4,12 @@ import { useActionState, useState } from "react";
 import { saveListing, type FormState } from "@/app/admin/actions";
 import { slugify } from "@/lib/format";
 import type { LocalKind, LocalListing } from "@/lib/types";
+import { field as input, panel as card, pillPrimary } from "./admin-ui";
 import { ImageUpload } from "./post-editor";
 
-const input = "w-full rounded-lg border border-line bg-paper px-3 py-1.5 text-sm";
-const panel = "grid gap-4 rounded-2xl border border-line bg-card p-5 sm:grid-cols-2";
+const panel = `${card} grid gap-4 p-[22px] sm:grid-cols-2`;
 const KINDS: { value: LocalKind; label: string }[] = [
-  { value: "cafes", label: "Board game café" }, { value: "communities", label: "Community" }, { value: "games", label: "Made in Indonesia (game)" },
+  { value: "cafes", label: "Kafe board game" }, { value: "communities", label: "Komunitas" }, { value: "games", label: "Game buatan Indonesia" },
 ];
 const LANGS = [{ code: "id", label: "Bahasa Indonesia" }, { code: "en", label: "English" }] as const;
 
@@ -20,44 +20,44 @@ export function LocalEditor({ listing, games, canUpload }: { listing: LocalListi
   const [image, setImage] = useState(listing?.imageUrl ?? "");
 
   return (
-    <form action={action} className="space-y-6">
+    <form action={action} className="max-w-5xl space-y-6">
       <input type="hidden" name="id" value={listing?.id ?? ""} />
 
       <div className={panel}>
-        <label className="text-sm font-medium">Section
+        <label className="text-sm font-medium">Bagian
           <select name="kind" value={kind} onChange={(e) => setKind(e.target.value as LocalKind)} className={`${input} mt-1`}>
             {KINDS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}
           </select>
         </label>
         <label className="text-sm font-medium">Status
           <select name="status" defaultValue={listing?.status ?? "draft"} className={`${input} mt-1`}>
-            <option value="draft">Draft (hidden)</option>
-            <option value="published">Published</option>
+            <option value="draft">Draf (tersembunyi)</option>
+            <option value="published">Terbit</option>
           </select>
         </label>
-        <label className="text-sm font-medium">Name
+        <label className="text-sm font-medium">Nama
           <input name="name" required maxLength={160} value={name} onChange={(e) => setName(e.target.value)} className={`${input} mt-1`} />
         </label>
-        <label className="text-sm font-medium">Slug <span className="font-normal text-muted">(URL)</span>
-          <input name="slug" defaultValue={listing?.slug ?? ""} placeholder={slugify(name) || "auto from name"} className={`${input} mt-1`} />
+        <label className="text-sm font-medium">Tautan <span className="font-normal text-muted">(URL)</span>
+          <input name="slug" defaultValue={listing?.slug ?? ""} placeholder={slugify(name) || "otomatis dari nama"} className={`${input} mt-1`} />
         </label>
-        <label className="text-sm font-medium">City
+        <label className="text-sm font-medium">Kota
           <input name="city" maxLength={80} defaultValue={listing?.city ?? ""} placeholder="Jakarta" className={`${input} mt-1`} />
         </label>
-        <label className="text-sm font-medium">Contact <span className="font-normal text-muted">(shown publicly)</span>
+        <label className="text-sm font-medium">Kontak <span className="font-normal text-muted">(tampil publik)</span>
           <input name="contact" maxLength={120} defaultValue={listing?.contact ?? ""} className={`${input} mt-1`} />
         </label>
-        <label className="text-sm font-medium sm:col-span-2">Address
+        <label className="text-sm font-medium sm:col-span-2">Alamat
           <input name="address" maxLength={300} defaultValue={listing?.address ?? ""} className={`${input} mt-1`} />
         </label>
         {kind === "games" && (
           <>
-            <label className="text-sm font-medium">Designer / publisher
+            <label className="text-sm font-medium">Desainer / penerbit
               <input name="designer" maxLength={120} defaultValue={listing?.designer ?? ""} className={`${input} mt-1`} />
             </label>
-            <label className="text-sm font-medium">Game in the catalog <span className="font-normal text-muted">(optional)</span>
+            <label className="text-sm font-medium">Game di katalog <span className="font-normal text-muted">(opsional)</span>
               <select name="gameId" defaultValue={listing?.gameId ?? ""} className={`${input} mt-1`}>
-                <option value="">None</option>
+                <option value="">Tidak ada</option>
                 {games.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
               </select>
             </label>
@@ -66,7 +66,7 @@ export function LocalEditor({ listing, games, canUpload }: { listing: LocalListi
       </div>
 
       <div className={panel}>
-        <label className="text-sm font-medium">Google Maps link
+        <label className="text-sm font-medium">Tautan Google Maps
           <input name="mapUrl" type="url" defaultValue={listing?.mapUrl ?? ""} className={`${input} mt-1`} />
         </label>
         <label className="text-sm font-medium">Website
@@ -76,7 +76,7 @@ export function LocalEditor({ listing, games, canUpload }: { listing: LocalListi
           <input name="instagramUrl" type="url" defaultValue={listing?.instagramUrl ?? ""} className={`${input} mt-1`} />
         </label>
         <div>
-          <label className="text-sm font-medium">Image URL
+          <label className="text-sm font-medium">URL gambar
             <input name="imageUrl" type="url" value={image} onChange={(e) => setImage(e.target.value)} className={`${input} mt-1`} />
           </label>
           <ImageUpload enabled={canUpload} onUploaded={(url) => setImage((c) => c || url)} />
@@ -87,16 +87,16 @@ export function LocalEditor({ listing, games, canUpload }: { listing: LocalListi
         {LANGS.map((l) => {
           const text = listing?.text[l.code];
           return (
-            <fieldset key={l.code} className="space-y-4 rounded-2xl border border-line bg-card p-5">
+            <fieldset key={l.code} className={`${card} space-y-4 p-[22px]`}>
               <legend className="px-1 text-sm font-medium">{l.label}</legend>
-              <label className="block text-sm font-medium">Summary
-                <textarea name={`summary_${l.code}`} rows={2} maxLength={300} defaultValue={text?.summary ?? ""} className={`${input} mt-1`} />
+              <label className="block text-sm font-medium">Ringkasan
+                <textarea name={`summary_${l.code}`} rows={2} maxLength={300} defaultValue={text?.summary ?? ""} className={`${input} mt-1 py-2`} />
               </label>
-              <label className="block text-sm font-medium">Schedule / hours
+              <label className="block text-sm font-medium">Jadwal / jam buka
                 <input name={`schedule_${l.code}`} maxLength={200} defaultValue={text?.schedule ?? ""} className={`${input} mt-1`} />
               </label>
-              <label className="block text-sm font-medium">Description <span className="font-normal text-muted">(Markdown)</span>
-                <textarea name={`body_${l.code}`} rows={8} defaultValue={text?.body ?? ""} className={`${input} mt-1 font-mono`} />
+              <label className="block text-sm font-medium">Deskripsi <span className="font-normal text-muted">(Markdown)</span>
+                <textarea name={`body_${l.code}`} rows={8} defaultValue={text?.body ?? ""} className={`${input} mt-1 py-2 font-mono`} />
               </label>
             </fieldset>
           );
@@ -104,8 +104,8 @@ export function LocalEditor({ listing, games, canUpload }: { listing: LocalListi
       </div>
 
       <div className="flex items-center gap-3">
-        <button className="rounded-lg bg-felt px-4 py-2 text-sm font-medium text-on-felt disabled:opacity-60" disabled={pending}>
-          {pending ? "Saving…" : "Save"}
+        <button className={pillPrimary} disabled={pending}>
+          {pending ? "Menyimpan…" : "Simpan"}
         </button>
         {state.error && <p role="alert" className="text-sm text-meeple">{state.error}</p>}
       </div>

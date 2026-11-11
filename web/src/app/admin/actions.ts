@@ -8,6 +8,7 @@ import { z } from "zod";
 import { endSession, passwordMatches, requireAdmin, requireEditor, startSession } from "@/lib/auth";
 import { CATALOG_TAG, LOCAL_TAG, POSTS_TAG } from "@/lib/data";
 import { slugify } from "@/lib/format";
+import { PRESETS } from "@/lib/recommend";
 import { isTikTokShortLink, isTikTokUrl, parseDuration, parseTikTokId, parseVideoLink, type VideoRef } from "@/lib/video";
 import { LOCAL_KINDS, REVIEW_SOURCES, SUBSCORE_KEYS, VIDEO_FORMATS, type LocalListing, type SubScores } from "@/lib/types";
 import { db, hasDatabase } from "@/lib/db/client";
@@ -23,12 +24,12 @@ const attempts = new Map<string, { n: number; until: number }>();
 
 export async function login(_: FormState, form: FormData): Promise<FormState> {
   const bucket = attempts.get("admin") ?? { n: 0, until: 0 };
-  if (bucket.until > Date.now()) return { error: "Too many attempts. Try again in a minute." };
+  if (bucket.until > Date.now()) return { error: "Terlalu banyak percobaan. Coba lagi dalam semenit." };
   if (!passwordMatches(String(form.get("password") ?? ""))) {
     bucket.n++;
     if (bucket.n >= 5) Object.assign(bucket, { n: 0, until: Date.now() + 60_000 });
     attempts.set("admin", bucket);
-    return { error: "Wrong password." };
+    return { error: "Kata sandi salah." };
   }
   attempts.delete("admin");
   await startSession();
@@ -40,7 +41,7 @@ export async function logout() {
   redirect("/admin");
 }
 
-const NO_DB = "No database connected (DATABASE_URL is not set), so changes cannot be saved.";
+const NO_DB = "Belum ada database (DATABASE_URL kosong), jadi perubahan tidak bisa disimpan.";
 
 type Level = "admin" | "editor";
 const check = (level: Level) => (level === "admin" ? requireAdmin() : requireEditor());
@@ -69,7 +70,7 @@ const optionalInt = z.preprocess((v) => (v === "" || v === null ? null : v), z.c
 const optionalUrl = z.preprocess((v) => (v === "" ? null : v), z.url({ protocol: /^https?$/ }).nullable());
 
 const gameSchema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(200),
+  name: z.string().trim().min(1, "Nama wajib diisi").max(200),
   year: z.coerce.number().int().min(1800).max(2100),
   genreId: z.coerce.number().int().positive(),
   bggId: optionalInt,
@@ -95,7 +96,7 @@ export async function saveGame(_: FormState, form: FormData): Promise<FormState>
   for (const c of criteria) {
     const raw = form.get(`value.${c.key}`);
     const v = Number(raw);
-    if (raw === null || raw === "" || !Number.isFinite(v)) return { error: `${c.name}: enter a number` };
+    if (raw === null || raw === "" || !Number.isFinite(v)) return { error: `${c.name}: isi dengan angka` };
     values[c.key] = v;
   }
 
@@ -105,7 +106,7 @@ export async function saveGame(_: FormState, form: FormData): Promise<FormState>
     if (id) await db().update(schema.games).set(row).where(eq(schema.games.id, id));
     else await db().insert(schema.games).values(row);
   } catch (e) {
-    return { error: e instanceof Error && /unique/i.test(e.message) ? "Another game already uses that BGG id." : "Could not save the game." };
+    return { error: e instanceof Error && /unique/i.test(e.message) ? "BGG id itu sudah dipakai game lain." : "Game tidak bisa disimpan." };
   }
   updateTag(CATALOG_TAG);
   redirect("/admin/catalog?saved=game");
@@ -119,7 +120,7 @@ export async function deleteGame(form: FormData) {
 
 const criterionSchema = z.object({
   id: z.coerce.number().int().min(0),
-  key: z.string().regex(/^[a-zA-Z][a-zA-Z0-9]{1,39}$/, "Key: letters and digits, starting with a letter"),
+  key: z.string().regex(/^[a-zA-Z][a-zA-Z0-9]{1,39}$/, "Kunci: huruf dan angka, diawali huruf"),
   name: z.string().trim().min(1).max(80),
   unit: z.string().trim().max(20),
   hint: z.string().trim().max(300),
@@ -148,10 +149,10 @@ export async function saveCriterion(_: FormState, form: FormData): Promise<FormS
       });
     }
   } catch {
-    return { error: "Could not save (is the key already used?)" };
+    return { error: "Tidak bisa disimpan (kuncinya sudah dipakai?)" };
   }
   updateTag(CATALOG_TAG);
-  return { ok: "Saved" };
+  return { ok: "Tersimpan" };
 }
 
 export async function deleteCriterion(form: FormData) {
@@ -164,16 +165,16 @@ export async function saveGenre(_: FormState, form: FormData): Promise<FormState
   const blocked = await writeBlocked();
   if (blocked) return { error: blocked };
   const name = String(form.get("name") ?? "").trim();
-  if (!name || name.length > 80) return { error: "Enter a genre name" };
+  if (!name || name.length > 80) return { error: "Isi nama genre" };
   const id = Number(form.get("id"));
   try {
     if (id) await db().update(schema.genres).set({ name }).where(eq(schema.genres.id, id));
     else await db().insert(schema.genres).values({ name });
   } catch {
-    return { error: "That genre already exists" };
+    return { error: "Genre itu sudah ada" };
   }
   updateTag(CATALOG_TAG);
-  return { ok: "Saved" };
+  return { ok: "Tersimpan" };
 }
 
 export async function deleteGenre(_: FormState, form: FormData): Promise<FormState> {
@@ -182,10 +183,34 @@ export async function deleteGenre(_: FormState, form: FormData): Promise<FormSta
   try {
     await db().delete(schema.genres).where(eq(schema.genres.id, Number(form.get("id"))));
   } catch {
-    return { error: "Genre is still used by games; move them first." };
+    return { error: "Genre masih dipakai game; pindahkan dulu." };
   }
   updateTag(CATALOG_TAG);
-  return { ok: "Deleted" };
+  return { ok: "Terhapus" };
+}
+
+/** Keeps a game in the catalog while taking it out of (or back into) recommendations. */
+export async function setGameRecommended(id: number, recommended: boolean) {
+  await guard();
+  await db().update(schema.games).set({ recommended }).where(eq(schema.games.id, z.number().int().positive().parse(id)));
+  updateTag(CATALOG_TAG);
+}
+
+const presetWeightsSchema = z.object({
+  presetId: z.string().refine((id) => id !== "balanced" && PRESETS.some((p) => p.id === id)),
+  weights: z.record(z.string().max(40), z.number().int().min(0).max(10)),
+});
+
+/** Publishes the importances for a mood preset; visitors get them on their next load. */
+export async function savePresetWeights(presetId: string, weights: Record<string, number>): Promise<FormState> {
+  const blocked = await writeBlocked();
+  if (blocked) return { error: blocked };
+  const parsed = presetWeightsSchema.safeParse({ presetId, weights });
+  if (!parsed.success) return { error: "Bobot tidak valid." };
+  await db().insert(schema.presetWeights).values(parsed.data)
+    .onConflictDoUpdate({ target: schema.presetWeights.presetId, set: { weights: parsed.data.weights, updatedAt: sql`now()` } });
+  updateTag(CATALOG_TAG);
+  return { ok: "Tayang" };
 }
 
 // ---------------------------------------------------------------------------
@@ -247,17 +272,17 @@ export async function savePost(_: FormState, form: FormData): Promise<FormState>
   const d = parsed.data;
 
   const text = { id: langText(form, "id"), en: langText(form, "en") };
-  if (!text.id && !text.en) return { error: "Write a title in at least one language." };
+  if (!text.id && !text.en) return { error: "Tulis judul setidaknya dalam satu bahasa." };
 
   const video = d.video ? await resolveVideo(d.video) : null;
   if (d.video && !video) {
     return { error: isTikTokShortLink(d.video)
-      ? "Couldn't read that TikTok share link. Open it in a browser and paste the full tiktok.com/@user/video/… address."
-      : "That doesn't look like a YouTube or TikTok link." };
+      ? "Tautan bagikan TikTok itu tidak terbaca. Buka di peramban lalu tempel alamat lengkap tiktok.com/@user/video/…"
+      : "Itu bukan tautan YouTube atau TikTok." };
   }
-  if (d.type === "videos" && !video) return { error: "Video posts need a YouTube or TikTok link." };
+  if (d.type === "videos" && !video) return { error: "Konten video perlu tautan YouTube atau TikTok." };
   const durationSec = d.duration && video ? parseDuration(d.duration) : null;
-  if (d.duration && video && durationSec === null) return { error: "Write the duration like 6:12." };
+  if (d.duration && video && durationSec === null) return { error: "Tulis durasi seperti 6:12." };
 
   const subscores: SubScores = {};
   if (d.type === "reviews") {
@@ -265,15 +290,15 @@ export async function savePost(_: FormState, form: FormData): Promise<FormState>
       const raw = String(form.get(`sub_${key}`) ?? "").trim();
       if (!raw) continue;
       const value = Number(raw);
-      if (!Number.isFinite(value) || value < 0 || value > 10) return { error: "Sub-scores must be between 0 and 10." };
+      if (!Number.isFinite(value) || value < 0 || value > 10) return { error: "Sub-skor harus antara 0 dan 10." };
       subscores[key] = value;
     }
   }
 
   const slug = slugify(d.slug || (text.id ?? text.en)!.title);
-  if (!slug) return { error: "Slug is empty." };
+  if (!slug) return { error: "Tautan kosong." };
   const publishedAt = d.publishedAt ? new Date(d.publishedAt) : d.status === "published" ? new Date() : null;
-  if (publishedAt && Number.isNaN(publishedAt.getTime())) return { error: "Invalid publish date." };
+  if (publishedAt && Number.isNaN(publishedAt.getTime())) return { error: "Tanggal terbit tidak valid." };
 
   const row = {
     type: d.type, status: d.status, slug, publishedAt, coverUrl: d.coverUrl,
@@ -289,7 +314,7 @@ export async function savePost(_: FormState, form: FormData): Promise<FormState>
     if (id) await db().update(schema.posts).set(row).where(eq(schema.posts.id, id));
     else await db().insert(schema.posts).values(row);
   } catch (e) {
-    return { error: e instanceof Error && /unique/i.test(e.message) ? `The slug "${slug}" is already used.` : "Could not save the post." };
+    return { error: e instanceof Error && /unique/i.test(e.message) ? `Tautan "${slug}" sudah dipakai.` : "Konten tidak bisa disimpan." };
   }
   updateTag(POSTS_TAG);
   redirect("/admin/posts?saved=1");
@@ -311,7 +336,7 @@ const blankToNull = (max: number) => z.string().trim().max(max).default("").tran
 const listingSchema = z.object({
   kind: z.enum(LOCAL_KINDS),
   status: z.enum(["draft", "published"]),
-  name: z.string().trim().min(1, "Name is required").max(160),
+  name: z.string().trim().min(1, "Nama wajib diisi").max(160),
   slug: z.string().trim().max(120),
   city: z.string().trim().max(80),
   address: blankToNull(300),
@@ -338,7 +363,7 @@ export async function saveListing(_: FormState, form: FormData): Promise<FormSta
   if (!parsed.success) return { error: parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ") };
   const { slug: rawSlug, ...d } = parsed.data;
   const slug = slugify(rawSlug || d.name);
-  if (!slug) return { error: "Slug is empty." };
+  if (!slug) return { error: "Tautan kosong." };
 
   const text: LocalListing["text"] = { id: listingLangText(form, "id"), en: listingLangText(form, "en") };
   const row = {
@@ -352,7 +377,7 @@ export async function saveListing(_: FormState, form: FormData): Promise<FormSta
     if (id) await db().update(schema.localListings).set(row).where(eq(schema.localListings.id, id));
     else await db().insert(schema.localListings).values(row);
   } catch (e) {
-    return { error: e instanceof Error && /unique/i.test(e.message) ? `The slug "${slug}" is already used.` : "Could not save the listing." };
+    return { error: e instanceof Error && /unique/i.test(e.message) ? `Tautan "${slug}" sudah dipakai.` : "Listing tidak bisa disimpan." };
   }
   updateTag(LOCAL_TAG);
   redirect("/admin/local?saved=1");
@@ -364,16 +389,24 @@ export async function deleteListing(form: FormData) {
   updateTag(LOCAL_TAG);
 }
 
+/** Publishes a listing or returns it to draft without opening the editor. */
+export async function setListingStatus(form: FormData) {
+  await guard("editor");
+  const status = z.enum(["draft", "published"]).parse(form.get("status"));
+  await db().update(schema.localListings).set({ status, updatedAt: sql`now()` }).where(eq(schema.localListings.id, Number(form.get("id"))));
+  updateTag(LOCAL_TAG);
+}
+
 const MAX_UPLOAD = 4 * 1024 * 1024;
 
 /** Uploads an image to Vercel Blob and returns its public URL. */
 export async function uploadImage(form: FormData): Promise<{ url?: string; error?: string }> {
   await requireEditor();
-  if (!process.env.BLOB_READ_WRITE_TOKEN) return { error: "Image upload needs a Vercel Blob store (BLOB_READ_WRITE_TOKEN)." };
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return { error: "Unggah gambar perlu Vercel Blob (BLOB_READ_WRITE_TOKEN)." };
   const file = form.get("file");
-  if (!(file instanceof File) || !file.size) return { error: "Choose an image." };
-  if (!/^image\/(png|jpe?g|webp|gif|avif)$/.test(file.type)) return { error: "Use PNG, JPG, WebP, GIF or AVIF." };
-  if (file.size > MAX_UPLOAD) return { error: "Images must be under 4 MB." };
+  if (!(file instanceof File) || !file.size) return { error: "Pilih gambar." };
+  if (!/^image\/(png|jpe?g|webp|gif|avif)$/.test(file.type)) return { error: "Gunakan PNG, JPG, WebP, GIF, atau AVIF." };
+  if (file.size > MAX_UPLOAD) return { error: "Ukuran gambar maksimal 4 MB." };
   const ext = file.type.split("/")[1].replace("jpeg", "jpg");
   const blob = await put(`posts/${slugify(file.name.replace(/\.[^.]+$/, "")) || "image"}.${ext}`, file, {
     access: "public", addRandomSuffix: true, contentType: file.type,

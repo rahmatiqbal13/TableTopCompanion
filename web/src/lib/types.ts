@@ -42,6 +42,8 @@ export interface Game {
   categories: string[];
   mechanics: string[];
   description: string | null;
+  /** False: stays in the catalog but is never recommended. Absent counts as true. */
+  recommended?: boolean;
   /** Ratings from TableTop Companion users (not banned), when there are any. */
   community?: { rating: number; votes: number } | null;
 }
@@ -50,6 +52,8 @@ export interface Catalog {
   genres: Genre[];
   criteria: Criterion[];
   games: Game[];
+  /** Admin-tuned importances per mood preset: preset id -> criterion key -> 0..10. */
+  presetWeights?: Record<string, Record<string, number>>;
   /** False when no DATABASE_URL is set and the bundled seed data is served. */
   live: boolean;
   updatedAt: string | null;

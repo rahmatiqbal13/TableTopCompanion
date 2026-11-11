@@ -35,6 +35,15 @@ export const games = pgTable("games", {
   categories: jsonb("categories").$type<string[]>().notNull().default([]),
   mechanics: jsonb("mechanics").$type<string[]>().notNull().default([]),
   description: text("description"),
+  /** False keeps the game in the catalog but out of recommendations. */
+  recommended: boolean("recommended").notNull().default(true),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** Admin-tuned importances (criterion key -> 0..10) for a recommender mood preset. */
+export const presetWeights = pgTable("preset_weights", {
+  presetId: varchar("preset_id", { length: 40 }).primaryKey(),
+  weights: jsonb("weights").$type<Record<string, number>>().notNull().default({}),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

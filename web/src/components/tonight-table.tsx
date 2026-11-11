@@ -30,7 +30,7 @@ export function TonightTable({ catalog, t, lang }: { catalog: Catalog; t: Dict; 
   const prefs: Preferences = useMemo(() => ({
     ...defaultPreferences(catalog),
     groupSize: players, maxTime: time, youngestAge: age,
-    criteria: PRESETS.find((p) => p.id === mood)!.criteria(catalog.criteria),
+    criteria: PRESETS.find((p) => p.id === mood)!.criteria(catalog.criteria, catalog.presetWeights?.[mood]),
   }), [catalog, players, time, age, mood]);
   const result = useMemo(() => recommend(catalog, prefs), [catalog, prefs]);
   const picks = result.items.slice(0, 3);

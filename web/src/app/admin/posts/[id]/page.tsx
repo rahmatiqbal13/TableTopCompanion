@@ -1,21 +1,19 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { FreshAfterSubmit } from "@/components/admin-fresh-form";
+import { AdminHeader } from "@/components/admin-shell";
 import { AdminSignIn } from "@/components/admin-signin";
-
+import { panel } from "@/components/admin-ui";
 import { PostEditor } from "@/components/post-editor";
 import { canEdit } from "@/lib/auth";
 import { getAllPostsForAdmin, getCatalog } from "@/lib/data";
 
 export default function EditPostPage({ params }: PageProps<"/admin/posts/[id]">) {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10">
-      <Link href="/admin/posts" className="text-sm text-muted underline">← Posts</Link>
-      <Suspense fallback={<p className="mt-4 text-muted">Loading…</p>}>
-        <Editor params={params} />
-      </Suspense>
-    </div>
+    <Suspense fallback={<p className="text-muted">Memuat…</p>}>
+      <Editor params={params} />
+    </Suspense>
   );
 }
 
@@ -29,13 +27,9 @@ async function Editor({ params }: { params: Promise<{ id: string }> }) {
   const games = catalog.games.map(({ id, name, year }) => ({ id, name, year })).sort((a, b) => a.name.localeCompare(b.name));
   return (
     <>
-      <h1 className="mb-6 mt-2 font-display text-3xl font-semibold tracking-tight">{post ? "Edit post" : "New post"}</h1>
-      {!catalog.live && (
-        <p className="mb-6 rounded-xl border border-gold/40 bg-card p-4 text-sm">
-          Read-only: connect a database (DATABASE_URL) to save posts.
-        </p>
-      )}
-      <PostEditor post={post ?? null} games={games} canUpload={Boolean(process.env.BLOB_READ_WRITE_TOKEN)} />
+      <AdminHeader kicker="Editor" title={post ? "Edit konten" : "Tulis"} />
+      {!catalog.live && <p className={`${panel} mb-6 p-4 text-sm`}>Hanya baca: hubungkan database (DATABASE_URL) untuk menyimpan konten.</p>}
+      <FreshAfterSubmit><PostEditor key={post ? `${post.id}-${post.updatedAt}` : "new"} post={post ?? null} games={games} canUpload={Boolean(process.env.BLOB_READ_WRITE_TOKEN)} /></FreshAfterSubmit>
     </>
   );
 }

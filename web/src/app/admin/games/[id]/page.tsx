@@ -1,7 +1,8 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { FreshAfterSubmit } from "@/components/admin-fresh-form";
+import { AdminHeader } from "@/components/admin-shell";
 import { AdminSignIn } from "@/components/admin-signin";
 import { GameForm } from "@/components/admin-forms";
 import { isAdmin } from "@/lib/auth";
@@ -9,12 +10,9 @@ import { getCatalog } from "@/lib/data";
 
 export default function EditGamePage({ params }: PageProps<"/admin/games/[id]">) {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10">
-      <Link href="/admin/catalog" className="text-sm text-muted underline">← Catalog</Link>
-      <Suspense fallback={<p className="mt-4 text-muted">Loading…</p>}>
-        <Editor params={params} />
-      </Suspense>
-    </div>
+    <Suspense fallback={<p className="text-muted">Memuat…</p>}>
+      <Editor params={params} />
+    </Suspense>
   );
 }
 
@@ -27,8 +25,8 @@ async function Editor({ params }: { params: Promise<{ id: string }> }) {
   if (id !== "new" && !game) notFound();
   return (
     <>
-      <h1 className="mb-6 mt-2 font-display text-3xl font-semibold tracking-tight">{game ? `Edit ${game.name}` : "Add a game"}</h1>
-      <GameForm game={game ?? null} genres={catalog.genres} criteria={catalog.criteria} />
+      <AdminHeader kicker="Katalog" title={game ? game.name : "Tambah game"} />
+      <FreshAfterSubmit><GameForm game={game ?? null} genres={catalog.genres} criteria={catalog.criteria} /></FreshAfterSubmit>
     </>
   );
 }

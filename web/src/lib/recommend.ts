@@ -65,7 +65,8 @@ export interface Preset {
   id: string;
   label: string;
   description: string;
-  criteria: (criteria: Criterion[]) => Record<string, CriterionPref>;
+  /** `weights` are the admin's saved importances for this preset, when there are any. */
+  criteria: (criteria: Criterion[], weights?: Record<string, number>) => Record<string, CriterionPref>;
 }
 
 export function adminDefaults(criteria: Criterion[]): Record<string, CriterionPref> {
@@ -76,15 +77,19 @@ export function adminDefaults(criteria: Criterion[]): Record<string, CriterionPr
 
 /** Known criterion keys get tuned values; unknown (admin-added) keys keep defaults. */
 function tuned(overrides: Record<string, CriterionPref>): Preset["criteria"] {
-  return (criteria) => {
+  return (criteria, weights) => {
     const base = adminDefaults(criteria);
-    for (const key of Object.keys(base)) if (overrides[key]) base[key] = overrides[key];
+    for (const key of Object.keys(base)) {
+      if (overrides[key]) base[key] = overrides[key];
+      if (weights?.[key] !== undefined) base[key] = { ...base[key], importance: weights[key] };
+    }
     return base;
   };
 }
 
 export const PRESETS: Preset[] = [
-  { id: "balanced", label: "Balanced", description: "The curator's default weights", criteria: adminDefaults },
+  // Tuned through each criterion's default weight, so it ignores saved preset weights.
+  { id: "balanced", label: "Balanced", description: "The curator's default weights", criteria: (criteria) => adminDefaults(criteria) },
   {
     id: "beginner", label: "Beginner", description: "Simple rules first, quick to finish",
     criteria: tuned({
@@ -313,6 +318,7 @@ export function recommend(catalog: Catalog, prefs: Preferences): RecommendationR
   const excluded: RecommendationResult["excluded"] = {};
   const candidates: Game[] = [];
   for (const g of catalog.games) {
+    if (g.recommended === false) continue; // taken out by an admin; not a mismatch to report
     const reason = exclusionReason(g, prefs, catalog.criteria);
     if (reason) {
       if (reason !== "favourite") excluded[reason] = (excluded[reason] ?? 0) + 1;
