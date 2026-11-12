@@ -84,12 +84,12 @@
  "games": [
   {
    "id": 1,
-   "bggId": null,
+   "bggId": 133473,
    "name": "Sushi Go!",
    "year": 2013,
    "genreId": 1,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://upload.wikimedia.org/wikipedia/en/9/98/Sushi_Go%21_box.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/133473",
    "values": {
     "minPlayers": 2,
     "playTime": 15,
@@ -97,23 +97,23 @@
     "rating": 7.1265,
     "minAge": 8
    },
-   "maxPlayers": null,
+   "maxPlayers": 5,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Sushi Go! is a board game designed by Phil Walker-Harding and published by Gamewright Games in 2013. It involves two to five players collecting cards representing sushi or associated items.\n\nWikipedia: https://en.wikipedia.org/wiki/Sushi_Go!"
   },
   {
    "id": 2,
-   "bggId": null,
+   "bggId": 140934,
    "name": "Arboretum!",
    "year": 2015,
    "genreId": 1,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/140934",
    "values": {
     "minPlayers": 2,
     "playTime": 30,
@@ -121,7 +121,7 @@
     "rating": 7.35791,
     "minAge": 8
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -132,12 +132,12 @@
   },
   {
    "id": 3,
-   "bggId": null,
+   "bggId": 12942,
    "name": "No Thanks!",
    "year": 2004,
    "genreId": 1,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b8/No_Thanks%21.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/12942",
    "values": {
     "minPlayers": 3,
     "playTime": 30,
@@ -145,14 +145,14 @@
     "rating": 7.04228,
     "minAge": 8
    },
-   "maxPlayers": null,
+   "maxPlayers": 5,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "No Thanks! is a card game for three to seven players designed by Thorsten Gimmler.  Originally called Geschenkt! (presented (as a gift) in German) and published by Amigo Spiele in 2004, it was translated into English by Z-Man Games.\n\nWikipedia: https://en.wikipedia.org/wiki/No_Thanks!_(game)"
   },
   {
    "id": 4,
@@ -204,12 +204,12 @@
   },
   {
    "id": 6,
-   "bggId": null,
+   "bggId": 37628,
    "name": "Haggis",
    "year": 2010,
    "genreId": 1,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/37628",
    "values": {
     "minPlayers": 2,
     "playTime": 45,
@@ -217,23 +217,23 @@
     "rating": 7.01568,
     "minAge": 13
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Haggis is a shedding card game similar to Tichu, Zheng Fen, and other East Asian climbing games. Haggis has received praise for being the first to successfully create a climbing, trick-taking game, designed from the start for two to three players, where most previous games required four players or more. The evenly distributed, face card \"bombs\" are a notable innovation for the genre, helping even out hand strength enough to make two-person play workable, and enhancing the strategic element of the game.\n\nThe game's designer, Sean Ross, developed Haggis over a period of several years, with first publication in late 2010 by Indie Boards and Cards. The game was named after haggis partly in a nod to Ross' Scottish heritage, but also because the game brought together the \"guts\" (scoring and play mechanisms) of several other climbing games. Haggis was a nominee for \"Best Card Game\" in the 2010 Golden Geek Awards by BoardGameGeek.\n\nWikipedia: https://en.wikipedia.org/wiki/Haggis_(card_game)"
   },
   {
    "id": 7,
-   "bggId": null,
+   "bggId": 153065,
    "name": "Linko!",
    "year": 2014,
    "genreId": 1,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/153065",
    "values": {
     "minPlayers": 2,
     "playTime": 20,
@@ -241,7 +241,7 @@
     "rating": 7.07323,
     "minAge": 10
    },
-   "maxPlayers": null,
+   "maxPlayers": 5,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -276,12 +276,12 @@
   },
   {
    "id": 9,
-   "bggId": null,
+   "bggId": 194880,
    "name": "Dream Home",
    "year": 2016,
    "genreId": 1,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/194880",
    "values": {
     "minPlayers": 2,
     "playTime": 40,
@@ -289,7 +289,7 @@
     "rating": 7.0175,
     "minAge": 7
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -372,12 +372,12 @@
   },
   {
    "id": 13,
-   "bggId": null,
+   "bggId": 2348,
    "name": "Lotus",
    "year": 2016,
    "genreId": 1,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/2348",
    "values": {
     "minPlayers": 2,
     "playTime": 30,
@@ -385,23 +385,23 @@
     "rating": 6.87912,
     "minAge": 8
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Lotus is a board game for two to four players, developed by Dominique Tellier and published by Ravensburger Spieleverlag. The objective of the game is to move one's pieces off the board before the other players. The game board is hexagonal, and contains a large image of a Chinese dragon in the middle, as well as a Chinese character in each board position.\n\nWikipedia: https://en.wikipedia.org/wiki/Lotus_(board_game)"
   },
   {
    "id": 14,
-   "bggId": null,
+   "bggId": 209872,
    "name": "Keltis",
    "year": 2008,
    "genreId": 1,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://upload.wikimedia.org/wikipedia/en/4/48/Keltis.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/209872",
    "values": {
     "minPlayers": 2,
     "playTime": 30,
@@ -409,14 +409,14 @@
     "rating": 6.44514,
     "minAge": 10
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Keltis is a board game designed by Reiner Knizia that won the Spiel des Jahres for best game of the year in 2008. In the US, it has been marketed as Lost Cities: The Board Game, though there are some subtle rules differences. \n\nIt is a multi-player board game that is based on the same theme as Knizia's two-player card game Lost Cities.  \n\nPlayers score points by playing cards, which must be played in ascending or descending order. Each turn, a card is played which advances the player's token along a stone path. Playing only 1 to 3 cards in a color results in negative points for that color. Each card played improves a player's score, and when at least 4 cards of one color have been played, positive points are scored for that path. Each player records progress using tokens. One token is taller, and points it collects are doubled.\n\nWikipedia: https://en.wikipedia.org/wiki/Keltis"
   },
   {
    "id": 15,
@@ -564,12 +564,12 @@
   },
   {
    "id": 21,
-   "bggId": null,
+   "bggId": 230802,
    "name": "Azul",
    "year": 2017,
    "genreId": 2,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://upload.wikimedia.org/wikipedia/en/2/23/Picture_of_Azul_game_box.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/230802",
    "values": {
     "minPlayers": 2,
     "playTime": 45,
@@ -577,23 +577,23 @@
     "rating": 7.95976,
     "minAge": 8
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Azul (Portuguese for \"blue\") is an abstract strategy board game designed by Michael Kiesling and released by Plan B Games in 2017. Based on Portuguese tiles called azulejos, in Azul players collect sets of similarly colored tiles which they place on their player board. When a row is filled, one of the tiles is moved into a square pattern on the right side of the player board, where it garners points depending on where it is placed in relation to other tiles on the board.\n\nWikipedia: https://en.wikipedia.org/wiki/Azul_(board_game)"
   },
   {
    "id": 22,
-   "bggId": null,
+   "bggId": 7854,
    "name": "YINSH",
    "year": 2003,
    "genreId": 2,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/YINSH_in_Play.jpg/960px-YINSH_in_Play.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/7854",
    "values": {
     "minPlayers": 2,
     "playTime": 60,
@@ -601,23 +601,23 @@
     "rating": 7.68973,
     "minAge": 9
    },
-   "maxPlayers": null,
+   "maxPlayers": 2,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "YINSH is an abstract strategy board game by game designer Kris Burm. It is the fifth game to be released in the GIPF Project. At the time of its release in 2003, Burm stated that he intended it to be considered as the sixth and last game of the project, and that the game which he had not yet released, PÜNCT, would be logically the fifth game. However, the series was later expanded to seven games with the release of LYNGK.\n\nGameplay consists of moving rings to flip Reversi-like discs.\n\nWikipedia: https://en.wikipedia.org/wiki/YINSH"
   },
   {
    "id": 23,
-   "bggId": null,
+   "bggId": 9674,
    "name": "Ingenious",
    "year": 2004,
    "genreId": 2,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Mensa_Connections.JPG/960px-Mensa_Connections.JPG",
+   "linkUrl": "https://boardgamegeek.com/boardgame/9674",
    "values": {
     "minPlayers": 1,
     "playTime": 45,
@@ -632,16 +632,16 @@
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Ingenious is the English name for Einfach Genial (Simply Ingenious), a German abstract strategy board game designed by Reiner Knizia under commission from Sophisticated Games and published in 2004 by Kosmos.  Across most of Europe it is titled as the local translation of Ingenious or Simply Ingenious, the notable exception being Mensa Connections in the UK.\n\nWikipedia: https://en.wikipedia.org/wiki/Ingenious_(board_game)"
   },
   {
    "id": 24,
-   "bggId": null,
+   "bggId": 31999,
    "name": "TZAAR",
    "year": 2007,
    "genreId": 2,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/Tzaar_2.jpg/960px-Tzaar_2.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/31999",
    "values": {
     "minPlayers": 2,
     "playTime": 60,
@@ -649,23 +649,23 @@
     "rating": 7.68264,
     "minAge": 13
    },
-   "maxPlayers": null,
+   "maxPlayers": 2,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "TZAAR  is the seventh game released in the GIPF series and Games Magazine's 2009 Game of the Year. It officially replaced TAMSK, which was originally published as the second board game in the GIPF Project.\n\nWikipedia: https://en.wikipedia.org/wiki/TZAAR"
   },
   {
    "id": 25,
-   "bggId": null,
+   "bggId": 2346,
    "name": "DVONN",
    "year": 2001,
    "genreId": 2,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/DVONN_in_Play.jpg/960px-DVONN_in_Play.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/2346",
    "values": {
     "minPlayers": 2,
     "playTime": 30,
@@ -673,23 +673,23 @@
     "rating": 7.44092,
     "minAge": 9
    },
-   "maxPlayers": null,
+   "maxPlayers": 2,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "DVONN is a two-player strategy board game in which the objective is to accumulate pieces in stacks.  It was released in 2001 by Kris Burm as the fourth game in the GIPF Project. DVONN won the 2002 International Gamers Award and the Games magazine Game of the Year Award in 2003.\n\nWikipedia: https://en.wikipedia.org/wiki/DVONN"
   },
   {
    "id": 26,
-   "bggId": null,
+   "bggId": 25669,
    "name": "Qwirkle",
    "year": 2006,
    "genreId": 2,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://upload.wikimedia.org/wikipedia/en/9/97/Qwirkle_Box.png",
+   "linkUrl": "https://boardgamegeek.com/boardgame/25669",
    "values": {
     "minPlayers": 2,
     "playTime": 45,
@@ -697,23 +697,23 @@
     "rating": 6.81079,
     "minAge": 6
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Qwirkle is a tile-based game for two to four players, designed by Susan McKinley Ross and published by MindWare in 2006. Qwirkle shares some characteristics with the games Rummikub and Scrabble. It is distributed in Canada by game and puzzle company Outset Media. Qwirkle is considered by MindWare to be its most awarded game of all time. In 2011, Qwirkle won the Spiel des Jahres. A sequel, Qwirkle Cubes, was released by Mindware in 2009. Players score points by building lines that share a common attribute, either color or shape.\n\nWikipedia: https://en.wikipedia.org/wiki/Qwirkle"
   },
   {
    "id": 27,
-   "bggId": null,
+   "bggId": 22484,
    "name": "Ingenious: Travel Edition",
    "year": 2006,
    "genreId": 2,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/22484",
    "values": {
     "minPlayers": 2,
     "playTime": 30,
@@ -732,12 +732,12 @@
   },
   {
    "id": 28,
-   "bggId": null,
+   "bggId": 197405,
    "name": "Tak",
    "year": 2017,
    "genreId": 2,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5a/Game_of_Tak.jpg/960px-Game_of_Tak.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/197405",
    "values": {
     "minPlayers": 2,
     "playTime": 60,
@@ -745,23 +745,23 @@
     "rating": 7.99094,
     "minAge": 12
    },
-   "maxPlayers": null,
+   "maxPlayers": 2,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Tak is a two-player abstract strategy game that first existed fictionally within Patrick Rothfuss's fantasy trilogy, The Kingkiller Chronicle, before being brought to life by James Ernest in collaboration with Rothfuss, and published by Cheapass Games in 2016. In 2021, Tak was incorporated as an event in the international Mind Sports Olympiad.\n\nIn Tak, players aim to connect two opposite edges of the board with pieces called \"stones\" and create a road. Players take turns placing their own stones and building a road while blocking and capturing their opponent's stones. The vertical stacking and unstacking of stones gives a three dimensional element to the game play.\n\nWikipedia: https://en.wikipedia.org/wiki/Tak_(game)"
   },
   {
    "id": 29,
-   "bggId": null,
+   "bggId": 3228,
    "name": "Pueblo",
    "year": 2002,
    "genreId": 2,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/64/Pueblo_1.jpg/960px-Pueblo_1.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/3228",
    "values": {
     "minPlayers": 2,
     "playTime": 60,
@@ -769,23 +769,23 @@
     "rating": 6.88013,
     "minAge": 10
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Pueblo is an abstract strategy game which is a competition to optimally place blocks in a constrained space. The name, theme, and artwork for the game derive from the famous architecture of Taos Pueblo, but they are very lightly applied.\n\nWikipedia: https://en.wikipedia.org/wiki/Pueblo_(game)"
   },
   {
    "id": 30,
-   "bggId": null,
+   "bggId": 116954,
    "name": "Indigo",
    "year": 2012,
    "genreId": 2,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Indigo_board_game.jpg/960px-Indigo_board_game.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/116954",
    "values": {
     "minPlayers": 2,
     "playTime": 30,
@@ -793,23 +793,23 @@
     "rating": 6.86876,
     "minAge": 8
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Indigo is a 2012 tile-laying board game developed by Reiner Knizia and published by Ravensburger.\n\nWikipedia: https://en.wikipedia.org/wiki/Indigo_(board_game)"
   },
   {
    "id": 31,
-   "bggId": null,
+   "bggId": 38545,
    "name": "Kamisado",
    "year": 2008,
    "genreId": 2,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b3/Kamisado-board1.jpg/960px-Kamisado-board1.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/38545",
    "values": {
     "minPlayers": 2,
     "playTime": 20,
@@ -817,23 +817,23 @@
     "rating": 6.9865,
     "minAge": 10
    },
-   "maxPlayers": null,
+   "maxPlayers": 2,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Kamisado is an abstract strategy board game for two players that is played on an 8x8 multicoloured board. Each player controls a set of eight octagonal dragon tower pieces. Each player's set of dragon towers contains a tower to match each of the colours that appear on the squares of the board (i.e., a brown tower, a green tower, etc.). One player's towers have gold dragons mounted on the top, while the other player's towers are topped with black dragons. The game was published in 2008 by Burley Games.\n\nWikipedia: https://en.wikipedia.org/wiki/Kamisado"
   },
   {
    "id": 32,
-   "bggId": null,
+   "bggId": 19764,
    "name": "punct",
    "year": 2005,
    "genreId": 2,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/P%C3%9CNCT_in_Play.jpg/960px-P%C3%9CNCT_in_Play.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/19764",
    "values": {
     "minPlayers": 2,
     "playTime": 30,
@@ -841,14 +841,14 @@
     "rating": 6.84274,
     "minAge": 10
    },
-   "maxPlayers": null,
+   "maxPlayers": 2,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "PÜNCT is a two-player strategy board game. It is the sixth release in the GIPF project of seven abstract strategy games, although it is considered the fifth game in the project.  It was released in 2005. PÜNCT won the Games Magazine Best Abstract Strategy game for 2007.\n\nWikipedia: https://en.wikipedia.org/wiki/P%C3%9CNCT"
   },
   {
    "id": 33,
@@ -876,12 +876,12 @@
   },
   {
    "id": 34,
-   "bggId": null,
+   "bggId": 19427,
    "name": "Gemblo",
    "year": 2005,
    "genreId": 2,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/19427",
    "values": {
     "minPlayers": 2,
     "playTime": 30,
@@ -889,7 +889,7 @@
     "rating": 6.84508,
     "minAge": 6
    },
-   "maxPlayers": null,
+   "maxPlayers": 6,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -924,12 +924,12 @@
   },
   {
    "id": 36,
-   "bggId": null,
+   "bggId": 19841,
    "name": "Pentago",
    "year": 2005,
    "genreId": 2,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Pentago-Game-Winning-Position.jpg/960px-Pentago-Game-Winning-Position.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/19841",
    "values": {
     "minPlayers": 2,
     "playTime": 5,
@@ -944,16 +944,16 @@
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Pentago is a two-player abstract strategy game invented by Tomas Flodén.\n\nThe game is played on a 6×6 board divided into four 3×3 sub-boards (or quadrants). Taking turns, the two players place a marble of their color (either black or white) onto an unoccupied space on the board, and then rotate one of the sub-boards by 90 degrees either clockwise or anti-clockwise. This is optional at the beginning of the game, up until every sub-board no longer has rotational symmetry, at which point it becomes mandatory (this is because until then, a player could rotate an empty sub-board or one with just a marble in the middle, either of which has no real effect). A player wins by getting five of their marbles in a vertical, horizontal, or diagonal row (either before or after the sub-board rotation in their move). If all 36 spaces on the board are occupied without a row of five being formed then the game is a draw.\n\nThere is also a 3-4 player version called Pentago XL. The board is made of 9 3×3 boards, and there are 4 colours (red, yellow, green and blue) instead of the basic 2.\n\nWikipedia: https://en.wikipedia.org/wiki/Pentago"
   },
   {
    "id": 37,
-   "bggId": null,
+   "bggId": 27356,
    "name": "Portobello Market",
    "year": 2007,
    "genreId": 2,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/27356",
    "values": {
     "minPlayers": 2,
     "playTime": 35,
@@ -961,7 +961,7 @@
     "rating": 6.40216,
     "minAge": 8
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -972,12 +972,12 @@
   },
   {
    "id": 38,
-   "bggId": null,
+   "bggId": 217083,
    "name": "LYNGK",
    "year": 2017,
    "genreId": 2,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/217083",
    "values": {
     "minPlayers": 2,
     "playTime": 60,
@@ -985,14 +985,14 @@
     "rating": 7.906,
     "minAge": 13
    },
-   "maxPlayers": null,
+   "maxPlayers": 2,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "The GIPF Project is a series of nine abstract strategy games by designer Kris Burm.\n\nThe series is named after the first game, GIPF. All the games take place on some form of hexagonal board. Each of the games, including GIPF, may be played individually. When playing a standard game of GIPF the game is played with normal pieces and GIPF pieces.  \n\nHowever, the series also allows players to link the GIPF game to the other games in the series or even to any game at all. It does this by introducing into the game of GIPF certain new pieces with special powers, called \"potentials\". Before you start a game of GIPF with potentials, the players decide to which game they link each potential piece. For example, the ZÈRTZ potential piece to a game of ZÈRTZ and the DVONN potential to a game of DVONN. But they could decide just as well to link the ZÈRTZ potential to a coin flip and the DVONN potential to a dice roll. Now, when playing the GIPF game with potentials, they can introduce potential pieces whenever they like (according to the playing rules). As soon as they want to use the special power of one of their potential pieces during the GIPF game, they put the GIPF board aside and play the game linked to that specific potential piece (in the example above ZÈRTZ and DVONN, respectively a coin flip and a dice roll). Upon victory the active player can use the power of the potential piece in the game of GIPF. If the active player loses, the special power of the potential piece cannot be used in the GIPF game.\n\nWikipedia: https://en.wikipedia.org/wiki/GIPF_Project"
   },
   {
    "id": 39,
@@ -1020,12 +1020,12 @@
   },
   {
    "id": 40,
-   "bggId": null,
+   "bggId": 125311,
    "name": "Okiya",
    "year": 2012,
    "genreId": 2,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/125311",
    "values": {
     "minPlayers": 2,
     "playTime": 10,
@@ -1033,7 +1033,7 @@
     "rating": 6.66412,
     "minAge": 7
    },
-   "maxPlayers": null,
+   "maxPlayers": 2,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -1044,12 +1044,12 @@
   },
   {
    "id": 41,
-   "bggId": null,
+   "bggId": 41916,
    "name": "The Magic Labyrinth",
    "year": 2009,
    "genreId": 3,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/The_Magic_Labyrinth.jpg/960px-The_Magic_Labyrinth.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/41916",
    "values": {
     "minPlayers": 2,
     "playTime": 15,
@@ -1057,23 +1057,23 @@
     "rating": 6.88331,
     "minAge": 6
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "The Magic Labyrinth is a 2009 children's fantasy board game designed by Dirk Baumann, for two to four players. The Magic Labyrinth is a labyrinth game with the objective of finding treasures hidden in the labyrinth. The labyrinth's walls are invisible, so players must memorize the locations of the walls in order to successfully claim treasure pieces.\n\nWikipedia: https://en.wikipedia.org/wiki/The_Magic_Labyrinth_(board_game)"
   },
   {
    "id": 42,
-   "bggId": null,
+   "bggId": 66588,
    "name": "Wits & Wagers Family",
    "year": 2010,
    "genreId": 3,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/66588",
    "values": {
     "minPlayers": 3,
     "playTime": 20,
@@ -1116,12 +1116,12 @@
   },
   {
    "id": 44,
-   "bggId": null,
+   "bggId": 125921,
    "name": "Catan: Junior",
    "year": 2012,
    "genreId": 3,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/125921",
    "values": {
     "minPlayers": 2,
     "playTime": 30,
@@ -1129,7 +1129,7 @@
     "rating": 6.7298,
     "minAge": 6
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -1140,12 +1140,12 @@
   },
   {
    "id": 45,
-   "bggId": null,
+   "bggId": 172931,
    "name": "Outfoxed",
    "year": 2014,
    "genreId": 3,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/172931",
    "values": {
     "minPlayers": 2,
     "playTime": 15,
@@ -1153,7 +1153,7 @@
     "rating": 7.27016,
     "minAge": 5
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -1164,12 +1164,12 @@
   },
   {
    "id": 46,
-   "bggId": null,
+   "bggId": 191004,
    "name": "My First Stone Age",
    "year": 2016,
    "genreId": 3,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/17-10-27_SPIEL_Stoneage_junior.jpg/960px-17-10-27_SPIEL_Stoneage_junior.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/191004",
    "values": {
     "minPlayers": 2,
     "playTime": 15,
@@ -1177,7 +1177,7 @@
     "rating": 6.82431,
     "minAge": 5
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -1212,12 +1212,12 @@
   },
   {
    "id": 48,
-   "bggId": null,
+   "bggId": 205125,
    "name": "Ticket to Ride: First Journey (U.S.)",
    "year": 2016,
    "genreId": 3,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/205125",
    "values": {
     "minPlayers": 2,
     "playTime": 30,
@@ -1225,7 +1225,7 @@
     "rating": 7.05917,
     "minAge": 6
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -1236,12 +1236,12 @@
   },
   {
    "id": 49,
-   "bggId": null,
+   "bggId": 12346,
    "name": "Spooky Stairs",
    "year": 2003,
    "genreId": 3,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/12346",
    "values": {
     "minPlayers": 2,
     "playTime": 15,
@@ -1249,7 +1249,7 @@
     "rating": 6.46765,
     "minAge": 4
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -1308,12 +1308,12 @@
   },
   {
    "id": 52,
-   "bggId": null,
+   "bggId": 41302,
    "name": "First Orchard",
    "year": 2009,
    "genreId": 3,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Primer%20Frutal%20-%20IMG20260607173907.jpg?width=640",
+   "linkUrl": "https://boardgamegeek.com/boardgame/41302",
    "values": {
     "minPlayers": 1,
     "playTime": 10,
@@ -1321,7 +1321,7 @@
     "rating": 6.77387,
     "minAge": 2
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -1332,12 +1332,12 @@
   },
   {
    "id": 53,
-   "bggId": null,
+   "bggId": 10814,
    "name": "Dawn Under",
    "year": 2004,
    "genreId": 3,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/GOADA_2008_%28a%29_038.jpg/960px-GOADA_2008_%28a%29_038.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/10814",
    "values": {
     "minPlayers": 2,
     "playTime": 30,
@@ -1428,12 +1428,12 @@
   },
   {
    "id": 57,
-   "bggId": null,
+   "bggId": 112598,
    "name": "Monster Factory",
    "year": 2012,
    "genreId": 3,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/112598",
    "values": {
     "minPlayers": 2,
     "playTime": 30,
@@ -1524,12 +1524,12 @@
   },
   {
    "id": 61,
-   "bggId": null,
+   "bggId": 150376,
    "name": "Dead of Winter: A Crossroads Game",
    "year": 2014,
    "genreId": 4,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/150376",
    "values": {
     "minPlayers": 2,
     "playTime": 210,
@@ -1537,23 +1537,23 @@
     "rating": 7.77802,
     "minAge": 14
    },
-   "maxPlayers": null,
+   "maxPlayers": 5,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Dead of Winter is a semi-cooperative survival strategy board game for two to five players designed by Jonathan Gilmour and Isaac Vega through Plaid Hat Games. The game is set in a post-apocalyptic, zombie-infested colony. Players are faction leaders who must work together to ensure the colony's survival through incoming zombies and lack of supplies. In addition, players have individual, secret win conditions that they must meet to be victorious.\n\nWikipedia: https://en.wikipedia.org/wiki/Dead_of_Winter:_A_Cross_Roads_Game"
   },
   {
    "id": 62,
-   "bggId": null,
+   "bggId": 37111,
    "name": "Battlestar Galactica: The Board Game",
    "year": 2008,
    "genreId": 4,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://upload.wikimedia.org/wikipedia/en/c/cd/Battlestar_Galactica_The_Board_Game%2C_Cover_Art.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/37111",
    "values": {
     "minPlayers": 3,
     "playTime": 300,
@@ -1561,14 +1561,14 @@
     "rating": 7.75995,
     "minAge": 10
    },
-   "maxPlayers": null,
+   "maxPlayers": 6,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Battlestar Galactica: The Board Game is a board game created by Corey Konieczka and first published by Fantasy Flight Games in 2008 based on the 2004 Battlestar Galactica series.\n\nPlayers take the roles of characters from the series, trying to guide the Galactica and its fleet to its destination, while combating the Cylons and other crises threatening it. One or more players are secretly enemy Cylons, who win if the humans fail to achieve their objective.\n\nWikipedia: https://en.wikipedia.org/wiki/Battlestar_Galactica:_The_Board_Game"
   },
   {
    "id": 63,
@@ -1620,12 +1620,12 @@
   },
   {
    "id": 65,
-   "bggId": null,
+   "bggId": 15,
    "name": "Cosmic Encounter",
    "year": 2008,
    "genreId": 4,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://upload.wikimedia.org/wikipedia/en/6/64/Cosmic_Encounter_%28FFG%29.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/15",
    "values": {
     "minPlayers": 3,
     "playTime": 120,
@@ -1633,14 +1633,14 @@
     "rating": 7.58766,
     "minAge": 12
    },
-   "maxPlayers": null,
+   "maxPlayers": 8,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Cosmic Encounter is a science fiction–themed strategy board game designed by \"Future Pastimes\" (collectively, Peter Olotka, Jack Kittredge and Bill Eberle, with Bill Norton) and originally published by Eon Games in 1977. In it, each player takes the role of a particular alien species, each with a unique power to bend or break one of the rules of the game, trying to establish control over the universe. The game was inducted into the Academy of Adventure Gaming Arts & Design Adventure Gaming Hall of Fame in 1997.\n\nCosmic Encounter is a dynamic and social game, with players being encouraged to interact, argue, form alliances, make deals, double-cross, and occasionally work together to protect the common good. Most editions of the game are designed for three to five players, although official rules exist for playing with as many as eight players.\n\nWikipedia: https://en.wikipedia.org/wiki/Cosmic_Encounter"
   },
   {
    "id": 66,
@@ -1668,12 +1668,12 @@
   },
   {
    "id": 67,
-   "bggId": null,
+   "bggId": 41114,
    "name": "The Resistance",
    "year": 2009,
    "genreId": 4,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/41114",
    "values": {
     "minPlayers": 5,
     "playTime": 30,
@@ -1681,14 +1681,14 @@
     "rating": 7.38861,
     "minAge": 13
    },
-   "maxPlayers": null,
+   "maxPlayers": 10,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "The Resistance is a social role-playing card-based social deduction party game. The game's premise involves a war between government and resistance groups, and players are assigned various roles related to these groups. A King Arthur themed-variant with additional roles is marketed as Avalon. Like other social deduction games, The Resistance and Avalon rely on certain players attempting to disrupt the larger group working together, while the rest of the players work to reveal the spy working against them.\n\nGames take upwards of half an hour, and are played with five to ten players. The Resistance was initially playable with a standard 52-card deck of playing cards, but the newest version of the game includes extra cards which cannot be simulated in such a way. The published version of the game includes a board to track progress, role cards, voting cards, mission success and fail cards, tokens, and additional game-modifying plot cards. Thematically, the game shares the same dystopian setting as Coup and Grifters, two other games by Indie Board & Cards.\n\nWikipedia: https://en.wikipedia.org/wiki/The_Resistance_(game)"
   },
   {
    "id": 68,
@@ -1716,12 +1716,12 @@
   },
   {
    "id": 69,
-   "bggId": null,
+   "bggId": 59959,
    "name": "Letters from Whitechapel",
    "year": 2011,
    "genreId": 4,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/59959",
    "values": {
     "minPlayers": 2,
     "playTime": 120,
@@ -1729,7 +1729,7 @@
     "rating": 7.47383,
     "minAge": 13
    },
-   "maxPlayers": null,
+   "maxPlayers": 6,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -1740,12 +1740,12 @@
   },
   {
    "id": 70,
-   "bggId": null,
+   "bggId": 475,
    "name": "Taj Mahal",
    "year": 2000,
    "genreId": 4,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://upload.wikimedia.org/wikipedia/en/3/33/Taj_Mahal_game.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/475",
    "values": {
     "minPlayers": 3,
     "playTime": 100,
@@ -1753,23 +1753,23 @@
     "rating": 7.31914,
     "minAge": 12
    },
-   "maxPlayers": null,
+   "maxPlayers": 5,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Taj Mahal is a German-style board game for 3–5 players designed by Reiner Knizia and first published in 2000 by Alea in German.\n\nWikipedia: https://en.wikipedia.org/wiki/Taj_Mahal_(board_game)"
   },
   {
    "id": 71,
-   "bggId": null,
+   "bggId": 6472,
    "name": "A Game of Thrones (first edition)",
    "year": 2003,
    "genreId": 4,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/BoardGOT.jpg/960px-BoardGOT.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/6472",
    "values": {
     "minPlayers": 3,
     "playTime": 180,
@@ -1777,14 +1777,14 @@
     "rating": 7.27462,
     "minAge": 12
    },
-   "maxPlayers": null,
+   "maxPlayers": 5,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "A Game of Thrones: The Board Game is a strategy board game created by Christian T. Petersen and published by Fantasy Flight Games in 2003. The game is based on the A Song of Ice and Fire series of high fantasy novels by George R. R. Martin. It was followed in 2004 by the expansion A Clash of Kings, and in 2006 by the expansion A Storm of Swords.\n\nA Game of Thrones allows players to take on the roles of several of the Great Houses of Westeros vying for control of the Seven Kingdoms, including House Stark, House Lannister, House Baratheon, House Greyjoy, House Tyrell, and as of the expansion A Clash of Kings, House Martell. Players maneuver armies to secure support in the various regions that comprise the Seven Kingdoms, with the goal of capturing enough support to claim the Iron Throne. The basic gameplay mechanics are reminiscent of Diplomacy, especially in the order-giving process, though A Game of Thrones is significantly more complicated overall. Upon its release, the game received positive reviews, and was nominated for several awards.\n\nWikipedia: https://en.wikipedia.org/wiki/A_Game_of_Thrones_(board_game)"
   },
   {
    "id": 72,
@@ -1812,12 +1812,12 @@
   },
   {
    "id": 73,
-   "bggId": null,
+   "bggId": 166384,
    "name": "Spyfall",
    "year": 2014,
    "genreId": 4,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/166384",
    "values": {
     "minPlayers": 3,
     "playTime": 15,
@@ -1825,23 +1825,23 @@
     "rating": 7.10834,
     "minAge": 12
    },
-   "maxPlayers": null,
+   "maxPlayers": 8,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Spyfall is a 2014 card game for 3–8 players designed by Alexander Ushan and published by Hobby World. A sequel, Spyfall 2, was published in 2017. A superhero themed variant, DC Spyfall, was published in 2018. The game's core premise revolves around uncovering the spy hidden among the players. As the game has evolved, new variations and \"advanced rules\" have emerged, introducing elements like multiple spies.\n\nWikipedia: https://en.wikipedia.org/wiki/Spyfall_(card_game)"
   },
   {
    "id": 74,
-   "bggId": null,
+   "bggId": 84419,
    "name": "Space Empires: 4X",
    "year": 2011,
    "genreId": 4,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://upload.wikimedia.org/wikipedia/en/2/2c/Cover_of_Space_Empires_4X.png",
+   "linkUrl": "https://boardgamegeek.com/boardgame/84419",
    "values": {
     "minPlayers": 1,
     "playTime": 180,
@@ -1856,7 +1856,7 @@
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Space Empires 4X is a 4X science fiction board wargame developed by Jim Krohn and published by GMT Games in 2011. It has received three expansions: Close Encounters (2012), Replicators (2018), and All Good Things (2025).\n\nWikipedia: https://en.wikipedia.org/wiki/Space_Empires_4X"
   },
   {
    "id": 75,
@@ -1908,12 +1908,12 @@
   },
   {
    "id": 77,
-   "bggId": null,
+   "bggId": 20100,
    "name": "Wits & Wagers",
    "year": 2005,
    "genreId": 4,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/20100",
    "values": {
     "minPlayers": 3,
     "playTime": 25,
@@ -1928,16 +1928,16 @@
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Wits & Wagers is a board game designed by Dominic Crapuchettes and Nate Heasley. It is published by North Star Games. The first edition of the game was published in 2005, and the second edition was released in 2007. The game is designed for 3 to 7 players or teams.\n\nWikipedia: https://en.wikipedia.org/wiki/Wits_and_Wagers"
   },
   {
    "id": 78,
-   "bggId": null,
+   "bggId": 177590,
    "name": "13 Days: The Cuban Missile Crisis",
    "year": 2016,
    "genreId": 4,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/177590",
    "values": {
     "minPlayers": 2,
     "playTime": 45,
@@ -1945,7 +1945,7 @@
     "rating": 7.58559,
     "minAge": 10
    },
-   "maxPlayers": null,
+   "maxPlayers": 2,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -1956,12 +1956,12 @@
   },
   {
    "id": 79,
-   "bggId": null,
+   "bggId": 72287,
    "name": "Mr. Jack Pocket",
    "year": 2010,
    "genreId": 4,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/72287",
    "values": {
     "minPlayers": 2,
     "playTime": 15,
@@ -1969,7 +1969,7 @@
     "rating": 6.9831,
     "minAge": 14
    },
-   "maxPlayers": null,
+   "maxPlayers": 2,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -1980,12 +1980,12 @@
   },
   {
    "id": 80,
-   "bggId": null,
+   "bggId": 25821,
    "name": "The Werewolves of Miller's Hollow",
    "year": 2001,
    "genreId": 4,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Les_Loups-garous_1.JPG/960px-Les_Loups-garous_1.JPG",
+   "linkUrl": "https://boardgamegeek.com/boardgame/25821",
    "values": {
     "minPlayers": 8,
     "playTime": 30,
@@ -1993,23 +1993,23 @@
     "rating": 6.83518,
     "minAge": 10
    },
-   "maxPlayers": null,
+   "maxPlayers": 18,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "The Werewolves of Miller's Hollow (French: Les Loups-garous de Thiercelieux, or sometimes only referred as Loups-garous) is a card game created by the French authors Philippe des Pallières and Hervé Marly that can be played with 8 to 18 players. The game is based on the Russian game Mafia. It was nominated for the 2003 Spiel des Jahres award. It is named after Thiercelieux, a small French village with less than 60 citizens.\n\nWikipedia: https://en.wikipedia.org/wiki/The_Werewolves_of_Millers_Hollow"
   },
   {
    "id": 81,
-   "bggId": null,
+   "bggId": 12333,
    "name": "Twilight Struggle",
    "year": 2005,
    "genreId": 5,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://upload.wikimedia.org/wikipedia/en/c/c1/GMTtwilightStruggle.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/12333",
    "values": {
     "minPlayers": 2,
     "playTime": 180,
@@ -2017,23 +2017,23 @@
     "rating": 8.35188,
     "minAge": 13
    },
-   "maxPlayers": null,
+   "maxPlayers": 2,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Twilight Struggle: The Cold War, 1945–1989 is a board game for two players, published by GMT Games in 2005. Players are the United States and Soviet Union contesting each other's influence on the world map by using cards that correspond to historical events. The first game designed by Ananda Gupta and Jason Matthews, they intended it to be a quick-playing alternative to more complex card-driven wargames.\n\nIt achieved critical acclaim for its well-integrated theme, accessibility and introduction of Eurogame elements. After being voted the number one game on BoardGameGeek from December 2010 to January 2016 (eventually dethroned by Pandemic Legacy), it has been called \"the best board game on the planet\". Twilight Struggle is played competitively and was unofficially adapted for play-by-email and live online play. GMT released a Deluxe Edition in 2009, as well as a Collector's Edition as part of the crowdfunding campaign for the game's official adaptation into a video game; this Digital Edition was released in 2016. With over 100,000 copies sold, the game is GMT's all-time best-seller.\n\nWikipedia: https://en.wikipedia.org/wiki/Twilight_Struggle"
   },
   {
    "id": 82,
-   "bggId": null,
+   "bggId": 21050,
    "name": "Combat Commander: Europe",
    "year": 2006,
    "genreId": 5,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/21050",
    "values": {
     "minPlayers": 2,
     "playTime": 180,
@@ -2052,12 +2052,12 @@
   },
   {
    "id": 83,
-   "bggId": null,
+   "bggId": 10630,
    "name": "Memoir '44",
    "year": 2004,
    "genreId": 5,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://upload.wikimedia.org/wikipedia/en/2/24/Memoir44_USBox.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/10630",
    "values": {
     "minPlayers": 2,
     "playTime": 60,
@@ -2065,23 +2065,23 @@
     "rating": 7.53824,
     "minAge": 8
    },
-   "maxPlayers": null,
+   "maxPlayers": 2,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Memoir '44 is a light wargame or war-themed strategy board game for two players. It was created by Richard Borg and published in 2004 by Days of Wonder. Illustration done by Julian Deveil and Cyrrile Dejuan. The game can be played with up to six players if played in teams and up to eight players in the \"Overlord\" scenarios. However, \"Overlord\" requires two copies of the game. It received the 2004 International Gamers Award for General Strategy, 2-Player category and The Wargamer 2004 Award for Excellence. The game is published in English and French (as Mémoire 44) by Days of Wonder.\n\nMemoir '44 simulates over a dozen of the battles connected with the D-Day invasions in World War II. It uses an enhanced version of the same Command & Colors game system as found in Battle Cry.\n\nWikipedia: https://en.wikipedia.org/wiki/Memoir_%2744"
   },
   {
    "id": 84,
-   "bggId": null,
+   "bggId": 17392,
    "name": "Here I Stand",
    "year": 2006,
    "genreId": 5,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/Wargaming_at_CSW_Expo_2009_%28002%29.jpg/960px-Wargaming_at_CSW_Expo_2009_%28002%29.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/17392",
    "values": {
     "minPlayers": 2,
     "playTime": 360,
@@ -2089,23 +2089,23 @@
     "rating": 7.94026,
     "minAge": 12
    },
-   "maxPlayers": null,
+   "maxPlayers": 6,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Here I Stand is a board wargame first published by GMT Games in 2006.\n\nWikipedia: https://en.wikipedia.org/wiki/Here_I_Stand_(boardgame)"
   },
   {
    "id": 85,
-   "bggId": null,
+   "bggId": 62227,
    "name": "Labyrinth: The War on Terror, 2001 – ?",
    "year": 2010,
    "genreId": 5,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://upload.wikimedia.org/wikipedia/en/c/c5/Labyrinth_The_War_on_Terror_cover.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/62227",
    "values": {
     "minPlayers": 1,
     "playTime": 180,
@@ -2120,16 +2120,16 @@
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Labyrinth: The War on Terror, 2001–? is a board game for one or two players, published by GMT Games in 2010.\n\nWikipedia: https://en.wikipedia.org/wiki/Labyrinth:_The_War_on_Terror,_2001_%E2%80%93_%3F"
   },
   {
    "id": 86,
-   "bggId": null,
+   "bggId": 62222,
    "name": "Commands & Colors: Napoleonics",
    "year": 2010,
    "genreId": 5,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/62222",
    "values": {
     "minPlayers": 2,
     "playTime": 90,
@@ -2137,7 +2137,7 @@
     "rating": 7.98087,
     "minAge": 14
    },
-   "maxPlayers": null,
+   "maxPlayers": 2,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -2148,12 +2148,12 @@
   },
   {
    "id": 87,
-   "bggId": null,
+   "bggId": 3685,
    "name": "Hammer of the Scots",
    "year": 2002,
    "genreId": 5,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/3685",
    "values": {
     "minPlayers": 2,
     "playTime": 180,
@@ -2168,16 +2168,16 @@
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Hammer of the Scots is a board game designed in 2002 by Jerry Taylor and Tom Dalgliesh and published by Columbia Games. It chronicles the Wars of Scottish Independence through roughly the time period portrayed in the film Braveheart.\n\nWikipedia: https://en.wikipedia.org/wiki/Hammer_of_the_Scots_(board_game)"
   },
   {
    "id": 88,
-   "bggId": null,
+   "bggId": 18098,
    "name": "Napoleon's Triumph",
    "year": 2007,
    "genreId": 5,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/18098",
    "values": {
     "minPlayers": 2,
     "playTime": 180,
@@ -2244,12 +2244,12 @@
   },
   {
    "id": 91,
-   "bggId": null,
+   "bggId": 144189,
    "name": "Fire in the Lake",
    "year": 2014,
    "genreId": 5,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/144189",
    "values": {
     "minPlayers": 1,
     "playTime": 180,
@@ -2257,7 +2257,7 @@
     "rating": 8.05631,
     "minAge": 14
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -2268,12 +2268,12 @@
   },
   {
    "id": 92,
-   "bggId": null,
+   "bggId": 28181,
    "name": "Combat Commander: Pacific",
    "year": 2008,
    "genreId": 5,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/28181",
    "values": {
     "minPlayers": 2,
     "playTime": 180,
@@ -2292,12 +2292,12 @@
   },
   {
    "id": 93,
-   "bggId": null,
+   "bggId": 41066,
    "name": "Virgin Queen",
    "year": 2012,
    "genreId": 5,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/41066",
    "values": {
     "minPlayers": 2,
     "playTime": 420,
@@ -2340,12 +2340,12 @@
   },
   {
    "id": 95,
-   "bggId": null,
+   "bggId": 29603,
    "name": "D-Day at Omaha Beach",
    "year": 2009,
    "genreId": 5,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/29603",
    "values": {
     "minPlayers": 1,
     "playTime": 480,
@@ -2388,12 +2388,12 @@
   },
   {
    "id": 97,
-   "bggId": null,
+   "bggId": 22825,
    "name": "Tide of Iron",
    "year": 2007,
    "genreId": 5,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://upload.wikimedia.org/wikipedia/en/7/7c/Tideofiron_2.gif",
+   "linkUrl": "https://boardgamegeek.com/boardgame/22825",
    "values": {
     "minPlayers": 2,
     "playTime": 120,
@@ -2401,14 +2401,14 @@
     "rating": 7.24557,
     "minAge": 12
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Tide of Iron is a World War II based wargame designed and published in 2007 by Fantasy Flight Games, also notable for publishing other large games containing a large number of counters and/or other components such as World of Warcraft: The Board Game and Arkham Horror.\n\nIn March 2013, Fantasy Flight Games announced a licensing deal with publisher 1A Games under which 1A would produce the Tide of Iron game line, including its current and future expansions. 1A Games refers to its upcoming Tide of Iron products collectively as the “Next Wave.”\n\nWikipedia: https://en.wikipedia.org/wiki/Tide_of_Iron"
   },
   {
    "id": 98,
@@ -2436,12 +2436,12 @@
   },
   {
    "id": 99,
-   "bggId": null,
+   "bggId": 17396,
    "name": "Manoeuvre",
    "year": 2008,
    "genreId": 5,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/17396",
    "values": {
     "minPlayers": 2,
     "playTime": 60,
@@ -2460,12 +2460,12 @@
   },
   {
    "id": 100,
-   "bggId": null,
+   "bggId": 68264,
    "name": "No Retreat! The Russian Front",
    "year": 2011,
    "genreId": 5,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/68264",
    "values": {
     "minPlayers": 1,
     "playTime": 360,
@@ -2473,7 +2473,7 @@
     "rating": 7.84742,
     "minAge": 12
    },
-   "maxPlayers": null,
+   "maxPlayers": 2,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -2484,12 +2484,12 @@
   },
   {
    "id": 101,
-   "bggId": null,
+   "bggId": 161936,
    "name": "Pandemic Legacy: Season 1",
    "year": 2015,
    "genreId": 6,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Playing%20board%20game%20-%20IMG%2020240110%20183908.jpg?width=640",
+   "linkUrl": "https://boardgamegeek.com/boardgame/161936",
    "values": {
     "minPlayers": 2,
     "playTime": 60,
@@ -2497,7 +2497,7 @@
     "rating": 8.66575,
     "minAge": 13
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -2508,12 +2508,12 @@
   },
   {
    "id": 102,
-   "bggId": null,
+   "bggId": 221107,
    "name": "Pandemic Legacy: Season 2",
    "year": 2017,
    "genreId": 6,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Playing%20board%20game%20-%20Play%201337%201736534208315.jpg?width=640",
+   "linkUrl": "https://boardgamegeek.com/boardgame/221107",
    "values": {
     "minPlayers": 2,
     "playTime": 60,
@@ -2521,7 +2521,7 @@
     "rating": 8.70088,
     "minAge": 14
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -2532,12 +2532,12 @@
   },
   {
    "id": 103,
-   "bggId": null,
+   "bggId": 30549,
    "name": "Pandemic",
    "year": 2008,
    "genreId": 6,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://upload.wikimedia.org/wikipedia/en/3/36/Pandemic_game.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/30549",
    "values": {
     "minPlayers": 2,
     "playTime": 45,
@@ -2545,23 +2545,23 @@
     "rating": 7.6615,
     "minAge": 8
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Pandemic is a cooperative board game designed by Matt Leacock and first published by Z-Man Games in the United States in 2008. Pandemic is based on the premise that four diseases have broken out in the world, each threatening to wipe out a region. Through the combined effort of all the players, the goal is to discover all four cures before any of several game-losing conditions are reached. The game accommodates two to four players, each playing one of seven possible roles: dispatcher, medic, scientist, researcher, operations expert, contingency planner, or quarantine specialist.\n\nThree expansions, Pandemic: On the Brink, Pandemic: In the Lab, and Pandemic: State of Emergency, co-designed by Matt Leacock and Tom Lehmann, each add several new roles and special events, as well as rule adjustments to allow a fifth player or to play in teams. In addition, several rule expansions are included, referred to as \"challenge kits\".\n\nPandemic is considered one of the most successful cooperative games that have reached mainstream market sales, condensing the strategic play offered by earlier cooperative games, like Arkham Horror, into a shorter, more accessible game that can be played by a broader range of players.\n\nWikipedia: https://en.wikipedia.org/wiki/Pandemic_(board_game)"
   },
   {
    "id": 104,
-   "bggId": null,
+   "bggId": 198928,
    "name": "Pandemic Iberia",
    "year": 2016,
    "genreId": 6,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/198928",
    "values": {
     "minPlayers": 2,
     "playTime": 45,
@@ -2569,7 +2569,7 @@
     "rating": 8.08068,
     "minAge": 8
    },
-   "maxPlayers": null,
+   "maxPlayers": 5,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -2580,12 +2580,12 @@
   },
   {
    "id": 105,
-   "bggId": null,
+   "bggId": 150658,
    "name": "Pandemic: The Cure",
    "year": 2014,
    "genreId": 6,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pandemic%20La%20Cura%20-%201be03a57-9a54-4564-bf01-cde4b3062782~1.jpg?width=640",
+   "linkUrl": "https://boardgamegeek.com/boardgame/150658",
    "values": {
     "minPlayers": 2,
     "playTime": 30,
@@ -2593,7 +2593,7 @@
     "rating": 7.39414,
     "minAge": 8
    },
-   "maxPlayers": null,
+   "maxPlayers": 5,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -2652,12 +2652,12 @@
   },
   {
    "id": 108,
-   "bggId": null,
+   "bggId": 157789,
    "name": "Pandemic: Contagion",
    "year": 2014,
    "genreId": 6,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/157789",
    "values": {
     "minPlayers": 2,
     "playTime": 30,
@@ -2665,7 +2665,7 @@
     "rating": 6.48856,
     "minAge": 14
    },
-   "maxPlayers": null,
+   "maxPlayers": 5,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -2724,12 +2724,12 @@
   },
   {
    "id": 111,
-   "bggId": null,
+   "bggId": 180020,
    "name": "Virus!",
    "year": 2015,
    "genreId": 6,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Virus%21%20IMG%2020210812%20140750-cropped.jpg?width=640",
+   "linkUrl": "https://boardgamegeek.com/boardgame/180020",
    "values": {
     "minPlayers": 2,
     "playTime": 20,
@@ -2737,7 +2737,7 @@
     "rating": 6.78848,
     "minAge": 8
    },
-   "maxPlayers": null,
+   "maxPlayers": 6,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -2796,12 +2796,12 @@
   },
   {
    "id": 114,
-   "bggId": null,
+   "bggId": 202977,
    "name": "Cytosis: A Cell Biology Game",
    "year": 2017,
    "genreId": 6,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/202977",
    "values": {
     "minPlayers": 2,
     "playTime": 90,
@@ -2809,14 +2809,14 @@
     "rating": 7.48661,
     "minAge": 10
    },
-   "maxPlayers": null,
+   "maxPlayers": 5,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Cytosis is a cell biology worker placement board game designed by John Coveyou and published in 2017 by Genius Games. The game's development was funded via a crowdfunding campaign on Kickstarter.\n\nWikipedia: https://en.wikipedia.org/wiki/Cytosis_(board_game)"
   },
   {
    "id": 115,
@@ -2964,12 +2964,12 @@
   },
   {
    "id": 121,
-   "bggId": null,
+   "bggId": 209010,
    "name": "Mechs vs. Minions",
    "year": 2016,
    "genreId": 7,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/209010",
    "values": {
     "minPlayers": 2,
     "playTime": 90,
@@ -2977,23 +2977,23 @@
     "rating": 8.2592,
     "minAge": 14
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Mechs vs. Minions is a 2016 cooperative board game published by Riot Games set in the League of Legends universe.\n\nWikipedia: https://en.wikipedia.org/wiki/Mechs_vs._Minions"
   },
   {
    "id": 122,
-   "bggId": null,
+   "bggId": 17133,
    "name": "Railways of the World",
    "year": 2005,
    "genreId": 7,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/17133",
    "values": {
     "minPlayers": 2,
     "playTime": 120,
@@ -3001,23 +3001,23 @@
     "rating": 7.69311,
     "minAge": 10
    },
-   "maxPlayers": null,
+   "maxPlayers": 6,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Railways of the World (originally Railroad Tycoon) is a railway-themed board game designed by Martin Wallace and Glenn Drover and published by Eagle Games. It is a simplified version of Wallace's earlier railway-themed game Age of Steam. The game, first released in 2005, was originally named Railroad Tycoon after the video game series of the same name, featuring box art based on the third entry in the video game series. After the license to use the Railroad Tycoon name expired, the board game has been published under its current Railways of the World title since 2009. It takes place in the eastern United States in 1830. Each player takes charge of a pioneering new railway company.\n\nWikipedia: https://en.wikipedia.org/wiki/Railways_of_the_World"
   },
   {
    "id": 123,
-   "bggId": null,
+   "bggId": 22545,
    "name": "Age of Empires III: The Age of Discovery",
    "year": 2007,
    "genreId": 7,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/GOADA%202008%20%28a%29%20107.jpg?width=640",
+   "linkUrl": "https://boardgamegeek.com/boardgame/22545",
    "values": {
     "minPlayers": 2,
     "playTime": 120,
@@ -3025,7 +3025,7 @@
     "rating": 7.57652,
     "minAge": 10
    },
-   "maxPlayers": null,
+   "maxPlayers": 5,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -3036,12 +3036,12 @@
   },
   {
    "id": 124,
-   "bggId": null,
+   "bggId": 77130,
    "name": "Sid Meier's Civilization: The Board Game",
    "year": 2010,
    "genreId": 7,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://upload.wikimedia.org/wikipedia/en/5/58/Civilzation_board_game_low.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/77130",
    "values": {
     "minPlayers": 2,
     "playTime": 240,
@@ -3049,23 +3049,23 @@
     "rating": 7.4848,
     "minAge": 13
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Sid Meier's Civilization: The Board Game is a 2010 board game created by Kevin Wilson based on the Sid Meier's Civilization series of video games and published by Fantasy Flight Games. While the previous board game based on Sid Meier's Civilization, published by Eagle Games in 2002, was based on Civilization III, the 2010 version takes its primary inspiration from Civilization IV. Its expansions, Fame and Fortune and Wisdom and Warfare, also began to incorporate concepts derived from Civilization V.\n\nWikipedia: https://en.wikipedia.org/wiki/Civilization_(2010_board_game)"
   },
   {
    "id": 125,
-   "bggId": null,
+   "bggId": 188920,
    "name": "This War of Mine: The Board Game",
    "year": 2017,
    "genreId": 7,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://upload.wikimedia.org/wikipedia/en/3/36/This_War_of_Mine_board_game_box_cover.webp",
+   "linkUrl": "https://boardgamegeek.com/boardgame/188920",
    "values": {
     "minPlayers": 1,
     "playTime": 120,
@@ -3073,23 +3073,23 @@
     "rating": 8.16571,
     "minAge": 18
    },
-   "maxPlayers": null,
+   "maxPlayers": 6,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "This War of Mine: The Board Game is a 2017 Polish cooperative board game published by Awaken Realms, designed by Michal Oracz and Jakub Wiśniewski as an adaptation of the video game This War of Mine. It has been noted for its bleak, unforgiving gameplay, often forcing players into ethical dilemmas. A war game from the perspective of civilians trying to survive a conflict that is primarily based on the siege of Sarajevo, it was announced in November 2015 by 11 Bit Studios, the video game's developer; after a successful Kickstarter campaign in 2016, it was released through several distributors the following year. While agreed upon by reviewers to not be a \"fun\" game, it has received mostly favorable reviews for its role as an artistic statement or educational tool.\n\nWikipedia: https://en.wikipedia.org/wiki/This_War_of_Mine:_The_Board_Game"
   },
   {
    "id": 126,
-   "bggId": null,
+   "bggId": 22827,
    "name": "StarCraft: The Board Game",
    "year": 2007,
    "genreId": 7,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a1/Gen_Con_Indy_2008_-_board_game_and_gamers.JPG/960px-Gen_Con_Indy_2008_-_board_game_and_gamers.JPG",
+   "linkUrl": "https://boardgamegeek.com/boardgame/22827",
    "values": {
     "minPlayers": 2,
     "playTime": 240,
@@ -3104,16 +3104,16 @@
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "StarCraft: The Board Game, published by Fantasy Flight Games, is a game inspired by the 1998 computer game StarCraft. Players take control of the three distinctive races featured in the video games, the Terrans, the Protoss, or the Zerg, to engage in battle across multiple worlds in order to achieve victory. Each of the three races features a fairly different playing style. A prototype of the game was shown at BlizzCon 2007, with pre-release copies sold at Gen Con 2007 and Penny Arcade Expo 2007. It was publicly released in October 2007.\n\nWikipedia: https://en.wikipedia.org/wiki/StarCraft:_The_Board_Game"
   },
   {
    "id": 127,
-   "bggId": null,
+   "bggId": 42776,
    "name": "Gears of War: The Board Game",
    "year": 2011,
    "genreId": 7,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/42776",
    "values": {
     "minPlayers": 1,
     "playTime": 180,
@@ -3252,12 +3252,12 @@
   },
   {
    "id": 133,
-   "bggId": null,
+   "bggId": 43022,
    "name": "Yomi",
    "year": 2011,
    "genreId": 7,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/43022",
    "values": {
     "minPlayers": 2,
     "playTime": 30,
@@ -3265,23 +3265,23 @@
     "rating": 7.09444,
     "minAge": 10
    },
-   "maxPlayers": null,
+   "maxPlayers": 2,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Yomi: Fighting Card Game (often shortened to Yomi) is a card game created by David Sirlin, inspired by Super Street Fighter II Turbo, which Sirlin also worked on. \"Yomi\" is Japanese for \"reading\", as in reading the mind of the opponent. The Yomi card game is designed to distill the high-level mind games from fighting game into a simple card game. It features asymmetric gameplay, and makes use of cards with multiple options.\n\nWikipedia: https://en.wikipedia.org/wiki/Yomi_(card_game)"
   },
   {
    "id": 134,
-   "bggId": null,
+   "bggId": 10640,
    "name": "Doom: The Boardgame",
    "year": 2004,
    "genreId": 7,
-   "imageUrl": null,
-   "linkUrl": null,
+   "imageUrl": "https://upload.wikimedia.org/wikipedia/en/0/0b/Doomboardgame.jpg",
+   "linkUrl": "https://boardgamegeek.com/boardgame/10640",
    "values": {
     "minPlayers": 2,
     "playTime": 180,
@@ -3296,16 +3296,16 @@
    "bggRank": null,
    "categories": [],
    "mechanics": [],
-   "description": null
+   "description": "Doom: The Boardgame is an adventure board game for two to four players (two to five in the 2016 edition) designed by Kevin Wilson and published by Fantasy Flight Games in 2004. The game is based on the Doom series of first-person shooter computer games, though it resembles Doom 3 more than it does the first four Doom video games.\n\nAn expansion was released for the game in 2005, called Doom: The Boardgame Expansion Set, which adds difficulty levels to the game, new game pieces and updates to some of the original rules, as well rules to play on Deathmatch and Capture the Flag.\n\nIn 2005, Fantasy Flight released Descent: Journeys in the Dark, which is based on the Doom game. Soon after this, the company ceased production of Doom.\n\nWikipedia: https://en.wikipedia.org/wiki/Doom:_The_Boardgame"
   },
   {
    "id": 135,
-   "bggId": null,
+   "bggId": 187377,
    "name": "Vikings Gone Wild",
    "year": 2017,
    "genreId": 7,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/187377",
    "values": {
     "minPlayers": 2,
     "playTime": 90,
@@ -3313,7 +3313,7 @@
     "rating": 7.51121,
     "minAge": 10
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,
@@ -3372,12 +3372,12 @@
   },
   {
    "id": 138,
-   "bggId": null,
+   "bggId": 232918,
    "name": "Fallout",
    "year": 2017,
    "genreId": 7,
    "imageUrl": null,
-   "linkUrl": null,
+   "linkUrl": "https://boardgamegeek.com/boardgame/232918",
    "values": {
     "minPlayers": 1,
     "playTime": 180,
@@ -3385,7 +3385,7 @@
     "rating": 7.63662,
     "minAge": 14
    },
-   "maxPlayers": null,
+   "maxPlayers": 4,
    "bestPlayers": [],
    "recPlayers": [],
    "votes": null,

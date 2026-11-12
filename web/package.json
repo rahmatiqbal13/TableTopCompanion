@@ -10,7 +10,8 @@
     "test": "vitest run",
     "db:setup": "tsx --env-file-if-exists=.env.local scripts/db-setup.ts",
     "db:generate": "drizzle-kit generate",
-    "bgg:import": "tsx --env-file-if-exists=.env.local scripts/import-bgg.ts"
+    "bgg:import": "tsx --env-file-if-exists=.env.local scripts/import-bgg.ts",
+    "wiki:import": "tsx --env-file-if-exists=.env.local scripts/import-wikidata.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

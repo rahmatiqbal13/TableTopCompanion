@@ -145,7 +145,7 @@ export const en = {
     back: "All games", bggRank: "BGG rank #{n}", votes: "{n} ratings",
     stats: "At a glance", players: "Players", time: "Play time", weight: "Complexity", rating: "BGG rating", age: "Age",
     best: "Best with", recommended: "Recommended with", mechanics: "Mechanics", categories: "Categories",
-    about: "About the game", aboutNote: "Description from BoardGameGeek (English).",
+    about: "About the game", aboutWiki: "Summary from", aboutNote: "Description from BoardGameGeek (English).",
     ourReview: "Our review", editorScore: "Editor's score", readReview: "Read the full review",
     videos: "Videos", related: "Articles about this game", similar: "If you like this, try",
     findSimilar: "Find similar games", viewBgg: "View on BoardGameGeek",

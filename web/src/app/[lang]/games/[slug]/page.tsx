@@ -70,6 +70,9 @@ async function GameHub({ params }: { params: Promise<{ lang: string; slug: strin
     .slice(0, 6)
     .map((x) => x.g);
 
+  // The Wikidata import ends a borrowed description with "Wikipedia: <url>" for the credit line.
+  const credit = game.description?.match(/\n*Wikipedia: (https:\/\/\S+)\s*$/);
+  const about = game.description ? { text: credit ? game.description.slice(0, credit.index).trim() : game.description, source: credit?.[1] ?? null } : null;
   const v = game.values;
   const num = (x: number | undefined, d: number) => x?.toLocaleString(t.intl, { minimumFractionDigits: d, maximumFractionDigits: d });
   const bgg = game.linkUrl ?? (game.bggId
@@ -156,11 +159,15 @@ async function GameHub({ params }: { params: Promise<{ lang: string; slug: strin
 
           {!posts.length && <p className="rounded-2xl border border-dashed border-line p-6 text-sm text-muted">{t.game.noContent}</p>}
 
-          {game.description && (
+          {about && (
             <section>
               <SectionHeading title={t.game.about} />
-              <p lang="en" className="whitespace-pre-line leading-relaxed">{game.description}</p>
-              <p className="mt-2 text-xs text-muted">{t.game.aboutNote}</p>
+              <p lang="en" className="whitespace-pre-line leading-relaxed">{about.text}</p>
+              <p className="mt-2 text-xs text-muted">
+                {about.source ? (
+                  <>{t.game.aboutWiki} <a href={about.source} target="_blank" rel="noreferrer" className="underline">Wikipedia</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noreferrer" className="underline">CC BY-SA 4.0</a></>
+                ) : t.game.aboutNote}
+              </p>
             </section>
           )}
         </div>

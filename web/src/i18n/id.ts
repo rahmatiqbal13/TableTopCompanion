@@ -151,7 +151,7 @@ export const id: Dict = {
     back: "Semua game", bggRank: "Peringkat BGG #{n}", votes: "{n} penilaian",
     stats: "Sekilas", players: "Pemain", time: "Durasi main", weight: "Kompleksitas", rating: "Rating BGG", age: "Usia",
     best: "Paling seru dengan", recommended: "Disarankan dengan", mechanics: "Mekanik", categories: "Kategori",
-    about: "Tentang game ini", aboutNote: "Deskripsi dari BoardGameGeek (bahasa Inggris).",
+    about: "Tentang game ini", aboutWiki: "Ringkasan (bahasa Inggris) dari", aboutNote: "Deskripsi dari BoardGameGeek (bahasa Inggris).",
     ourReview: "Ulasan kami", editorScore: "Skor editor", readReview: "Baca ulasan lengkap",
     videos: "Video", related: "Artikel tentang game ini", similar: "Kalau suka ini, coba juga",
     findSimilar: "Cari game serupa", viewBgg: "Lihat di BoardGameGeek",
